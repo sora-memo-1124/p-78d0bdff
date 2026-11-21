@@ -1,5 +1,5 @@
 # GitHub で自動で見回りをして、見るだけのページ（index.html）を作る（2026-11-22）
-# GitHub Actions（.github/workflows/update.yml）が30分ごとに動かす。
+# GitHub Actions（.github/workflows/update.yml）が5分ごとに動かす。
 # milkpost.py の見回り（YouTube・公式サイト・ニュース）をそのまま使う。通知は送らない（dry_run）。
 # 入れないもの：よてい帳・しめきり帳・通知の記録・通知の設定
 import argparse
@@ -37,7 +37,7 @@ hide = """  /* 公開用：見るだけのページなので、自分だけの�
 """
 html = html.replace("</style>", hide + "</style>", 1)
 snap = state.get("last_check") or ""
-note = f'<p class="static-note">🔄 {snap} の情報です（30分ごとくらいに自動で新しくなります）</p>'
+note = f'<p class="static-note">🔄 {snap} の情報です（5分ごとくらいに自動で新しくなります）</p>'
 html = html.replace('<div id="err"></div>', '<div id="err"></div>\n  ' + note, 1)
 data = json.dumps(state, ensure_ascii=False).replace("</", "<\\/")
 old_api = "async function api(path, opt = {}) {"
