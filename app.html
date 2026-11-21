@@ -1,0 +1,1442 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M!LKポスト</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Yomogi&family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* 読みやすいように少し濃くした色（2026年11月14日 アイデア1） */
+    --bg: #fffaf2; --dot: #ffe3ec; --text: #4a3b3b; --sub: #7a6464;
+    --pink: #c7406a; --pink-strong: #d6366a; --mint: #7cc6a4;
+    --green: #23794f; --orange: #b85a12; --rose: #c43d66; --blue-bg: #e6f4ff; --blue: #1f6fb2;
+    --line: #ffd6e2; --line2: #ffe0ea;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: var(--bg); }
+  body {
+    /* 背景（2026年11月14日 みんさんが決定）：いちばん上に白い小さなレース、
+       その下でメンバーカラーのオーロラがふんわり光り、下はクリーム色。
+       左から ピンク（佐野）→イエロー（吉田）→ブルー（塩﨑）→ホワイト（山中）→レッド（曽野） */
+    /* 2026年11月14日 更新：白いレースのかわりに、上は「I-4 ぽってり」（右によせてとろけるミルク＋5人の色のしずく）、
+       下は「C」（ミルクだまり＋5人の色のしずく）。ミルクの形は下の <svg> に、ページの幅に合わせて描く */
+    position: relative;
+    min-height: 100vh;
+    background-color: var(--bg);
+    background:
+      linear-gradient(180deg, transparent 0, transparent 120px, var(--bg) 300px) top left / 100% 340px no-repeat,
+      radial-gradient(circle at 10% 0, rgba(255,179,201,.8), transparent 40%) top left / 100% 340px no-repeat,
+      radial-gradient(circle at 30% 0, rgba(255,227,110,.8), transparent 35%) top left / 100% 340px no-repeat,
+      radial-gradient(circle at 50% 0, rgba(159,195,255,.8), transparent 35%) top left / 100% 340px no-repeat,
+      radial-gradient(circle at 70% 0, rgba(223,230,241,1), transparent 35%) top left / 100% 340px no-repeat,
+      radial-gradient(circle at 92% 0, rgba(255,148,148,.8), transparent 40%) top left / 100% 340px no-repeat,
+      radial-gradient(circle at 10% 100%, rgba(255,179,201,.6), transparent 40%) bottom left / 100% 260px no-repeat,
+      radial-gradient(circle at 30% 100%, rgba(255,227,110,.6), transparent 35%) bottom left / 100% 260px no-repeat,
+      radial-gradient(circle at 50% 100%, rgba(159,195,255,.6), transparent 35%) bottom left / 100% 260px no-repeat,
+      radial-gradient(circle at 70% 100%, rgba(223,230,241,1), transparent 35%) bottom left / 100% 260px no-repeat,
+      radial-gradient(circle at 92% 100%, rgba(255,148,148,.6), transparent 40%) bottom left / 100% 260px no-repeat,
+      var(--bg);
+    color: var(--text);
+    /* 文字は「よもぎ」（2026年11月14日 みんさんが決定）。よもぎは太字がないので、無理に太くしない */
+    font-family: "Yomogi", "M PLUS Rounded 1c", "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif;
+    font-synthesis: none;
+    font-size: 18px; line-height: 1.6;
+    padding: 96px 16px 48px;
+  }
+  .melt-top, .melt-bottom { position: absolute; left: 0; width: 100%; pointer-events: none; z-index: 0; overflow: visible; }
+  .melt-top { top: 0; height: 124px; filter: drop-shadow(0 2px 3px rgba(226,87,127,.2)); }
+  .melt-bottom { bottom: 0; height: 120px; filter: drop-shadow(0 -2px 3px rgba(226,87,127,.2)); }
+  .wrap { position: relative; z-index: 1; }
+  .wrap { max-width: 560px; margin: 0 auto; }
+  h1 { font-size: 26px; font-weight: 800; color: var(--pink); }
+  /* タイトルは5人の色のふちの名札（2026年11月14日 見本C） */
+  h1 { display: table; margin: 0 auto 6px; padding: 6px 22px; border-radius: 999px; border: 4px solid transparent;
+       background: linear-gradient(#fff, #fff) padding-box, linear-gradient(90deg, #ffb3c9, #ffe36e, #9fc3ff, #dfe6f1, #ff9494) border-box;
+       box-shadow: 0 3px 10px rgba(226,87,127,.18); position: relative; z-index: 2; }
+  .last { font-size: 16px; color: var(--sub); margin-top: 2px; text-align: center; }
+  .err { margin-top: 8px; font-size: 16px; color: #fff; background: var(--pink); padding: 8px 12px; border-radius: 12px; }
+  .info { margin-top: 8px; font-size: 15px; color: var(--sub); }
+  button { font-family: inherit; cursor: pointer; }
+  .btn-check {
+    display: block; width: 100%; margin: 16px 0 22px;
+    /* 案2「こげ茶の文字＋うすいミルク色」（2026年11月14日 みんさんが決定） */
+    font-size: 22px; font-weight: 800; letter-spacing: .06em; padding: 14px;
+    border: 2px solid #fff;
+    background: linear-gradient(135deg, #ffc2d4, #ffd8a8); color: #3d2e2e;
+    border-radius: 999px; box-shadow: 0 4px 0 #e2577f;
+  }
+  /* 見本F（2026年11月15日）：うすい5人の色＋こい5人の色のふち＋説明の文 */
+  .btn-check { border: 4px solid transparent; border-radius: 28px; padding: 10px 14px;
+               background: linear-gradient(90deg, #ffe3ec, #fff6cc, #e3eeff, #f1f4f9, #ffe0e0) padding-box,
+                           linear-gradient(90deg, #ffb3c9, #ffe36e, #9fc3ff, #dfe6f1, #ff9494) border-box;
+               box-shadow: 0 4px 12px rgba(226,87,127,.22); }
+  /* ふちの上のまん中に「クリック」の名札（2026年11月15日） */
+  .btn-check { position: relative; margin-top: 30px; }
+  .btn-check::before { content: "クリック"; position: absolute; top: -17px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+                       background: #fff; border: 3px solid #ffc2d4; border-radius: 999px; padding: 0 16px; font-size: 14px; font-weight: 700;
+                       letter-spacing: .08em; color: var(--pink); line-height: 26px; }
+  .btn-check .sub { display: block; font-size: 13px; font-weight: 400; letter-spacing: 0; color: #7a6262; margin-top: 2px; }
+  .btn-check:active { transform: translateY(3px); box-shadow: 0 1px 4px rgba(226,87,127,.22); }
+  .btn-check:disabled { opacity: .7; cursor: wait; }
+  h2 { font-size: 19px; font-weight: 800; color: var(--pink); margin: 4px 0 10px; }
+  .item {
+    display: block; padding: 12px 14px; margin-bottom: 10px; text-decoration: none; color: inherit;
+    background: #fff; border: 2px solid var(--line); border-radius: 18px;
+  }
+  .item:hover { border-color: #ffb3c8; }
+  .meta { font-size: 15px; color: var(--sub); display: flex; gap: 8px; align-items: center; }
+  .tag { font-size: 14px; font-weight: 700; padding: 1px 9px; border-radius: 999px; background: var(--blue-bg); color: var(--blue); }
+  .tag.live { background: var(--pink-strong); color: #fff; }
+  .tag.short { background: #fff0d9; color: #b85a12; }
+  .ttl { font-size: 17px; margin-top: 4px;
+         display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all; }
+  .empty { font-size: 16px; color: var(--sub); padding: 10px 4px; }
+  .more { display: block; width: 100%; font-size: 16px; padding: 10px; margin-bottom: 10px;
+          background: #fff; border: 2px solid var(--line2); border-radius: 999px; color: var(--sub); }
+  form { padding: 14px; margin: 6px 0 14px; background: #fff; border: 2px dashed #ffb3c8; border-radius: 18px; }
+  label { display: block; font-size: 15px; color: var(--sub); margin-bottom: 4px; }
+  input {
+    width: 100%; font-family: inherit; font-size: 17px; padding: 10px 12px; margin-bottom: 10px;
+    background: var(--bg); border: 2px solid var(--line2); border-radius: 12px; color: var(--text);
+  }
+  input:focus { outline: none; border-color: #ffb3c8; }
+  .btn-add { width: 100%; font-size: 18px; font-weight: 800; padding: 11px; border: none; background: var(--mint); color: #4a3b3b; border-radius: 999px; }
+  .form-msg { font-size: 15px; color: var(--pink); min-height: 1.4em; margin-top: 6px; }
+  .dl { display: flex; align-items: center; gap: 10px; padding: 12px 14px; margin-bottom: 10px; background: #fff; border: 2px solid var(--line2); border-radius: 18px; }
+  .dl .name { flex: 1; font-size: 17px; min-width: 0; word-break: break-all; }
+  .dl .name a { color: inherit; }
+  .dl .date { font-size: 14px; color: var(--sub); display: block; }
+  .left { font-size: 17px; font-weight: 800; white-space: nowrap; color: var(--green); }
+  .left.soon { color: var(--rose); }
+  .left.over { color: var(--sub); }
+
+  /* ===== 2026年11月14日 デザインのアイデアを入れたところ ===== */
+  /* アイデア3：いちばん上の「つぎの締め切り」の帯 */
+  .next { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 8px 14px; width: 100%;
+          background: #fff; border: 2px solid var(--line); border-radius: 999px; font-family: inherit;
+          font-size: 16px; color: var(--text); text-align: left; cursor: pointer; min-height: 48px; }
+  .next .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .next b { color: var(--rose); white-space: nowrap; font-weight: 800; }
+  /* アイデア4：新着を日にちで区切る */
+  .day { font-size: 15px; font-weight: 800; color: var(--sub); margin: 12px 4px 6px; display: flex; align-items: center; gap: 8px; }
+  .day::after { content: ""; flex: 1; height: 2px; background: var(--line); border-radius: 2px; }
+  /* アイデア5：まだ見ていない最新に小さな点 ／ アイデア7：配信のカードに太い線 */
+  .item { position: relative; }
+  .item.live { border-left: 8px solid var(--pink-strong); }
+  .dot { position: absolute; top: 12px; right: 12px; width: 10px; height: 10px; border-radius: 50%; background: var(--pink-strong); }
+  /* アイデア2：大きな数字のカウントダウン */
+  .count { width: 68px; height: 68px; flex: none; border-radius: 50%; display: flex; flex-direction: column;
+           align-items: center; justify-content: center; line-height: 1.1; color: #fff; background: var(--green); }
+  .count small { font-size: 12px; font-weight: 700; }
+  .count strong { font-size: 26px; font-weight: 800; }
+  .count.week { background: var(--orange); }
+  .count.soon { background: var(--rose); }
+  .count.over { background: #b9a8a8; }
+  .count.today strong { font-size: 18px; }
+  .dl.over { opacity: .7; }
+  /* インスタを見るボタン */
+  .btn-sns { display: flex; align-items: center; justify-content: center; min-height: 48px; margin: -8px 0 22px;
+             padding: 8px 16px; background: #fff; border: 2px solid var(--line); border-radius: 999px;
+             color: var(--pink); font-size: 17px; text-decoration: none; }
+  .btn-sns:hover { border-color: #ffb3c8; }
+  .btn-sns { margin-bottom: 10px; }
+  .sns-label { font-size: 15px; color: var(--sub); margin: 0 4px 6px; }
+  .sns-members { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 22px; }
+  .sns-members a { display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 6px 10px;
+                   background: #fff; border: 2px solid var(--line2); border-radius: 999px; color: var(--text);
+                   font-size: 16px; text-decoration: none; }
+  .sns-members a::before { content: "📷"; margin-right: 6px; font-size: 14px; }
+  .sns-members a:hover { border-color: #ffb3c8; }
+  /* ボタンはみんな同じ大きさ。1つ余ったら、まん中に置く */
+  .sns-members { display: flex; flex-wrap: wrap; justify-content: center; }
+  .sns-members a { flex: 0 0 calc(50% - 4px); }
+  .sns-members.x a::before { content: "📣"; }
+  /* 新着の「YouTube／ニュース」切りかえ（2026年11月14日 案B） */
+  .tabs { display: flex; gap: 8px; margin: 0 0 10px; }
+  .tab { flex: 1; min-height: 48px; border-radius: 999px; border: 2px solid var(--line); background: #fff;
+         font-family: inherit; font-size: 17px; color: var(--sub); }
+  .tab.on { background: #ffc2d4; border-color: #ffc2d4; color: #3d2e2e; }
+  .tag.src { background: #fff3d6; color: #7a4d00; white-space: nowrap; max-width: 9em; overflow: hidden; text-overflow: ellipsis; }
+  .item.news .meta { white-space: nowrap; }
+  .when { white-space: nowrap; }
+  .more2 { white-space: nowrap; margin-left: auto; font-size: 13px; color: var(--sub); background: #f6eeee; border-radius: 999px; padding: 0 8px; }
+  .item.news .dot + .meta .more2 { margin-right: 14px; }
+  /* タブは2だん（2つずつ）（2026年11月14日 みんさんが決定） */
+  /* 新着のタブは4つ横1列。絵が上、名前が下（2026年11月14日 見本B） */
+  .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+  .tabs .tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; min-height: 58px;
+               border-radius: 18px; padding: 2px; font-size: 13px; line-height: 1.2; white-space: nowrap; }
+  .tabs .tab .ic { font-size: 20px; }
+  /* 出演情報：出てくるメンバーの色の丸 */
+  .mem { margin-left: auto; display: inline-flex; gap: 3px; flex: none; }
+  .mem i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0,0,0,.08); }
+  .more2 + .mem { margin-left: 6px; }
+  .item.news .dot ~ .meta .mem { margin-right: 14px; }
+  /* ライブ情報（公式のお知らせはピンクのカード） */
+  .tag.official { background: var(--pink); color: #fff; white-space: nowrap; }
+  .item.official { background: #fff6f9; border-color: #ffc2d4; border-left: 7px solid #ffb3c9; }
+  .btn-official { display: flex; align-items: center; justify-content: center; min-height: 48px; margin: 0 0 10px;
+                  padding: 8px 14px; background: #fff; border: 2px solid var(--pink); border-radius: 999px;
+                  color: var(--pink); font-size: 16px; text-decoration: none; }
+  /* ===== 記事の種類分け ===== */
+  .chips.cats { margin: 0 0 8px; }
+  .chips.cats .chip { font-size: 14px; min-height: 36px; padding: 2px 10px; }
+  .chips.cats .chip small { font-size: 11px; color: inherit; opacity: .7; }
+  .cattag { white-space: nowrap; font-size: 11px; border-radius: 999px; padding: 0 7px; color: #fff; background: #b9a8a8; }
+  .c-video { background: #e2577f; } .c-drama { background: #7a4dbf; } .c-live { background: #c7406a; } .c-radio { background: #23794f; }
+  .c-magazine { background: #b85a12; } .c-music { background: #1f6fb2; } .c-tv { background: #2b6f9e; }
+  .btn-official.tver { margin-top: -2px; border-color: #1f6fb2; color: #1f6fb2; }
+  .btn-official.yt { border-color: #e03b3b; color: #e03b3b; }
+  .news-box { position: relative; border-radius: 24px; border: 3px solid transparent; margin: 30px 0 22px; padding: 24px 8px 6px;
+              background: linear-gradient(#fff, #fff) padding-box, linear-gradient(90deg, #ffb3c9, #ffe36e, #9fc3ff, #dfe6f1, #ff9494) border-box; }
+  .news-box > h2 { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); margin: 0; padding: 2px 18px; white-space: nowrap;
+                   background: #fff; border: 3px solid #ffc2d4; border-radius: 999px; font-size: 17px; }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn-row .btn-official { margin-top: -2px; padding: 6px 4px; font-size: 14px; white-space: nowrap; letter-spacing: -.02em; font-family: inherit; cursor: pointer; }
+  .btn-official.vid { border-color: #e2577f; color: #e2577f; }
+  .btn-row.two-line .btn-official { line-height: 1.25; min-height: 54px; text-align: center; }
+  .btn-official.vid.on { background: #e2577f; color: #fff; }
+  .more.back { margin: 0 0 10px; }
+  /* 出演タブの、種類ごとに開け閉めできる箱 */
+  .acc { border: 3px solid #ffc2d4; border-radius: 18px; background: #fff; margin: 0 0 8px; box-shadow: 0 2px 8px rgba(226,87,127,.10); }
+  .acc summary { list-style: none; cursor: pointer; min-height: 46px; display: flex; align-items: center; gap: 8px; padding: 6px 14px; font-size: 16px; color: var(--pink); }
+  .acc summary::-webkit-details-marker { display: none; }
+  .acc summary small { color: var(--sub); font-size: 12px; }
+  .acc summary::after { content: "▼"; margin-left: auto; font-size: 12px; transition: transform .2s; }
+  .acc[open] summary::after { transform: rotate(180deg); }
+  .acc .in { padding: 0 8px 4px; }
+  @media (prefers-reduced-motion: reduce) { .acc summary::after { transition: none; } }
+  .sect { display: flex; align-items: center; gap: 8px; font-size: 16px; color: var(--pink); margin: 14px 4px 6px; }
+  .sect small { font-size: 12px; color: var(--sub); }
+  .sect::after { content: ""; flex: 1; height: 2px; background: var(--line); border-radius: 2px; }
+  .item.news .meta { flex-wrap: nowrap; overflow: hidden; }
+  /* ===== よてい帳（2026年11月14日 追加） ===== */
+  .kind { display: inline-block; border-radius: 999px; padding: 0 8px; font-size: 12px; margin-right: 5px; color: #fff; vertical-align: 1px; white-space: nowrap; }
+  .k-yt { background: #d6366a; } .k-tv { background: #1f6fb2; } .k-dr { background: #7a4dbf; } .k-ra { background: #23794f; } .k-sns { background: #b85a12; } .k-live { background: #c2185b; } .k-art { background: #8a6d5a; }
+  .today { background: #fff; border: 3px solid #ffb3c9; border-radius: 20px; padding: 10px 14px; margin: 14px 0 -2px; }
+  .today .ev { text-decoration: none; color: inherit; }
+  .today .ev.past { opacity: .6; }
+  .today .ev2 .evmain { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; text-decoration: none; color: inherit; }
+  .today .ev2 .gos { display: flex; gap: 5px; flex: 0 0 auto; }
+  .today .ev2 .go { padding: 8px 10px; font-size: 14px; }
+  .today .ev2 .go.gtv { background: #fff; border: 2px solid #1f6fb2; color: #1f6fb2; font-weight: bold; }
+  .today .artnote { font-size: 11px; color: #a08888; text-align: center; margin: 4px 0 0; }
+  .today.none { border-width: 2px; border-style: dashed; color: var(--sub); font-size: 15px; text-align: center; padding: 10px 12px; }
+  .today.none small { display: block; font-size: 13px; color: var(--text); margin-top: 2px; }
+  .today h3 { font-size: 17px; color: var(--pink); font-weight: normal; margin-bottom: 4px; }
+  .today .ev { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 2px dashed var(--line2); }
+  .today .tname + .ev { border-top: none; }
+  .today .time { font-size: 22px; color: #3d2e2e; min-width: 58px; }
+  .today .nm { flex: 1; font-size: 15px; line-height: 1.4; min-width: 0; }
+  .left2 { display: block; font-size: 13px; color: var(--rose); } .left2.done { color: var(--sub); }
+  .go { background: #ffc2d4; border-radius: 999px; padding: 8px 14px; font-size: 15px; color: #3d2e2e; text-decoration: none; white-space: nowrap; min-height: 44px; display: inline-flex; align-items: center; }
+  .ev-form-box { background: #fff; border: 2px dashed #ffb3c9; border-radius: 18px; margin-bottom: 12px; }
+  .ev-form-box summary { list-style: none; cursor: pointer; min-height: 48px; display: flex; align-items: center; justify-content: center; color: var(--pink); font-size: 17px; }
+  .ev-form-box summary::-webkit-details-marker { display: none; }
+  .ev-form-box form { border: none; margin: 0; padding: 0 14px 14px; }
+  .ev-row { display: flex; gap: 10px; } .ev-row > div { flex: 1; min-width: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .chip { font-family: inherit; font-size: 15px; min-height: 40px; padding: 4px 12px; border: 2px solid var(--line); border-radius: 999px; background: #fff; color: var(--sub); }
+  .chip.on { background: #ffc2d4; border-color: #ffc2d4; color: #3d2e2e; }
+  .evitem { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 10px; background: #fff; border: 2px solid var(--line2); border-radius: 18px; }
+  .evitem .name { flex: 1; font-size: 16px; min-width: 0; word-break: break-all; line-height: 1.5; }
+  .evitem .name a { color: inherit; }
+  .evitem .date { display: block; font-size: 13px; color: var(--sub); }
+  .evitem .actions { flex: none; }
+  .cal { width: 56px; height: 56px; flex: none; border-radius: 14px; background: #fff6f9; border: 2px solid #ffc2d4; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; }
+  .cal b { font-weight: normal; font-size: 22px; color: var(--pink); } .cal small { font-size: 11px; color: var(--sub); }
+  .rep { font-size: 11px; background: #e6f6ee; color: var(--green); border-radius: 999px; padding: 0 7px; margin-left: 4px; white-space: nowrap; }
+  .rep.auto { background: #e6f4ff; color: var(--blue); }
+  .mem.inline { margin-left: 6px; display: inline-flex; vertical-align: middle; }
+  .cand { background: #fff6d6; border: 2px solid #ffe08a; border-radius: 16px; padding: 10px 12px; margin-bottom: 10px; font-size: 14px; line-height: 1.6; }
+  .cand b { font-weight: normal; color: #7a4d00; } .cand .ct, .cand .cw { display: block; }
+  .btn-cand { margin-top: 6px; font-family: inherit; font-size: 15px; min-height: 44px; background: #fff; border: 2px solid #e8c25a; border-radius: 999px; padding: 4px 14px; color: #7a4d00; }
+  /* SNSボタンをたためる箱 */
+  .sns-box { margin: 14px 0 0; background: #fff; border: 2px solid var(--line); border-radius: 24px; }
+  /* 5人の色の細いふち（2026年11月14日 見本A） */
+  .sns-box { border: 3px solid transparent;
+             background: linear-gradient(#fff, #fff) padding-box, linear-gradient(90deg, #ffb3c9, #ffe36e, #9fc3ff, #dfe6f1, #ff9494) border-box; }
+  .sns-box summary { white-space: nowrap; font-size: 16px; }
+  .sns-box summary { list-style: none; cursor: pointer; min-height: 48px; display: flex; align-items: center;
+                     justify-content: center; gap: 6px; padding: 8px 16px; color: var(--pink); font-size: 17px; }
+  .sns-box summary::-webkit-details-marker { display: none; }
+  .sns-box summary::after { content: "▼"; font-size: 12px; transition: transform .2s; }
+  .sns-box[open] summary::after { transform: rotate(180deg); }
+  .sns-box .sns-inner { padding: 4px 12px 2px; }
+  .sns-box .sns-members { margin-bottom: 14px; }
+  .sns-box .btn-sns { margin: 4px 0 10px; }
+  /* SNS の箱の中：公式4つのボタンと、メンバーの名前タブ（2026年11月14日） */
+  .sns-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 4px 0 12px; }
+  .sns-grid .sg { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 48px; padding: 4px 6px;
+                  background: #fff; border: 2px solid var(--line2); border-radius: 999px; color: var(--text); font-size: 15px; text-decoration: none; text-align: center; line-height: 1.2; white-space: nowrap; }
+  .sns-grid .sg small { font-size: 11px; color: var(--sub); }
+  .sns-grid .sg.yt { border-color: #e03b3b; color: #e03b3b; }
+  .sns-grid .sg.hp { border-color: var(--pink); color: var(--pink); }
+  .mem-tabs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 0 0 8px; }
+  .mem-tabs .mt { font-family: inherit; font-size: 15px; min-height: 40px; padding: 2px 12px; background: #fff; color: var(--text);
+                  border: 2px solid var(--line2); border-left: 8px solid var(--mc); border-radius: 999px; cursor: pointer; }
+  .mem-tabs .mt.on { background: var(--mc); border-color: var(--mc); font-weight: bold; }
+  /* どの携帯でも「上に3人・下に2人（まん中寄せ）」になるように、ボタンの幅を3等分にする（2026年11月14日） */
+  .mem-tabs .mt { flex: 0 0 calc((100% - 12px) / 3); padding: 2px 4px; white-space: nowrap; overflow: hidden; }
+  .milk-box { border-radius: 22px; padding: 3px; margin: 4px 0 12px; background: linear-gradient(90deg, #ffb3c9, #ffe36e, #9fc3ff, #dfe6f1, #ff9494); }
+  .milk-box > p { margin: 4px 0 0; text-align: center; font-size: 16px; font-weight: bold; color: var(--text); }
+  .milk-box .sns-grid { background: #fff; border-radius: 19px; padding: 8px; margin: 4px 0 0; }
+  /* YouTube タブの M!LK公式・動画インタビューのタブ（メンバーと同じ形。M!LK は文字が読みやすいうすい色） */
+  .mem-tabs.two .mt { flex: 0 0 calc((100% - 6px) / 2); font-size: 14px; letter-spacing: -.03em; }
+  .mem-tabs .mt.milk { --mc: #ffd6e2; border-left-width: 2px; border-color: #ffc2d4; }
+  .mem-tabs .mt.milk.on { background: linear-gradient(90deg, #ffe3ec, #fff6cc, #e3eeff, #f1f4f9, #ffe0e0); border: 2px solid #ffb3c9; color: var(--text); }
+  .mem-tabs .mt.vid { --mc: #f5a3bb; }
+  .ytm-head.milkh { background: linear-gradient(90deg, #ffe3ec, #fff6cc, #e3eeff, #f1f4f9, #ffe0e0); }
+  .ytm-head { border-radius: 18px; padding: 8px 12px; margin: 2px 0 8px; background: color-mix(in srgb, var(--mc) 30%, #fff);
+              display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .ytm-head b { font-size: 16px; } .ytm-head small { display: block; font-size: 11px; color: var(--sub); }
+  .ytm-head a { flex: 0 0 auto; font-size: 13px; border-radius: 999px; padding: 6px 12px; background: #fff; border: 2px solid #e03b3b; color: #e03b3b; text-decoration: none; }
+  .mem-line { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--sub); margin: 0 4px 6px; }
+  .mem-line::before, .mem-line::after { content: ""; flex: 1; height: 2px; background: var(--line); border-radius: 2px; }
+  .mem-links .sns-grid { background: color-mix(in srgb, var(--mc) 22%, #fff); border-radius: 20px; padding: 8px; }
+  @media (prefers-reduced-motion: reduce) { .sns-box summary::after { transition: none; } }
+  .dl.dl { flex-wrap: nowrap; }
+  .dl .actions { width: auto !important; flex: none; }
+  /* アイデア6：何もないときのやさしいひと言 */
+  .empty { padding: 14px; background: #fff; border: 2px dashed var(--line); border-radius: 18px; text-align: center; margin-bottom: 10px; }
+  /* 点々の枠を、少し太いうすいピンクの線＋ふんわりかげにした（2026年11月15日 見本B） */
+  .today.none, form, .ev-form-box, .empty { border: 3px solid #ffc2d4; box-shadow: 0 2px 8px rgba(226,87,127,.12); }
+  .ev-form-box form { border: none; box-shadow: none; }   /* よてい帳の中の入力は、外の枠だけ */
+  /* アイデア8：見回り中に 🥛 がゆれる（動きを減らす設定の人には動かさない） */
+  .milk { display: inline-block; }
+  .btn-check:disabled .milk { animation: yure 1s ease-in-out infinite; }
+  @keyframes yure { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } }
+  @media (prefers-reduced-motion: reduce) { .btn-check:disabled .milk { animation: none; } }
+  .del { font-size: 16px; min-height: 44px; min-width: 64px; padding: 6px 14px; background: transparent; border: 2px solid var(--line2); border-radius: 999px; color: var(--sub); }
+  .foot { margin-top: 26px; text-align: center; }
+  .btn-test { font-size: 16px; min-height: 48px; padding: 10px 20px; background: #fff; border: 2px solid var(--line2); border-radius: 999px; color: var(--sub); }
+  .foot p { font-size: 15px; color: var(--sub); margin-top: 6px; }
+  .warn { background: #fff; border: 2px solid var(--pink); border-radius: 18px; padding: 16px; margin-top: 16px; }
+
+  /* ===== スマホ向け ===== */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  button, a, input { -webkit-tap-highlight-color: rgba(226, 87, 127, .15); touch-action: manipulation; }
+  body { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right));
+         padding-bottom: max(150px, env(safe-area-inset-bottom)); overflow-x: hidden; }
+  .btn-check { min-height: 56px; }
+  .btn-add { min-height: 52px; }
+  .more { min-height: 48px; }
+  .item { min-height: 64px; }
+  input { min-height: 50px; font-size: 17px; -webkit-appearance: none; appearance: none; min-width: 0; display: block; }
+  input[type="date"] { line-height: 1.4; }
+  .dl { flex-wrap: wrap; }
+  .dl .name { flex: 1 1 160px; }
+  .dl .actions { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+  @media (max-width: 380px) {
+    body { font-size: 17px; }
+    h1 { font-size: 24px; }
+    .item, .dl, form { padding-left: 12px; padding-right: 12px; }
+    .dl .actions { width: 100%; justify-content: space-between; }
+  }
+  /* 🤝 会える予定（公式）（2026年11月15日 見本A）。「いま見回る！」と「最新」のあいだ */
+  .meet { margin: 26px 0 8px; position: relative; background: #fff; border: 3px solid #ffc2d4; border-radius: 22px; padding: 22px 14px 12px; box-shadow: 0 3px 10px rgba(255,150,180,.18); }
+  .meet > h3 { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #fff; border: 2px solid #ffc2d4; border-radius: 999px; padding: 2px 16px; font-size: 16px; color: var(--pink); white-space: nowrap; font-weight: normal; }
+  .meet .row { display: flex; gap: 10px; align-items: flex-start; padding: 9px 2px; border-top: 2px dashed #ffe0ea; text-decoration: none; color: inherit; }
+  .meet .row:first-of-type { border-top: none; }
+  .meet .tag2 { flex: 0 0 auto; font-size: 12px; background: #fff0f5; color: #d14d7a; border-radius: 999px; padding: 2px 9px; margin-top: 2px; }
+  .meet .t { font-size: 14px; line-height: 1.45; }
+  .meet .d { font-size: 12px; color: #a08888; }
+  .meet .note { font-size: 12px; color: #a08888; text-align: center; margin-top: 6px; }
+  /* 本日の放送・配信予定：5人の色のふちで囲み、上のまん中に名札「📢 本日」（2026年11月15日） */
+  .today, .today.none { position: relative; margin: 30px 0 4px; padding: 22px 14px 10px; border: 3px solid transparent; border-radius: 22px; box-shadow: 0 2px 8px rgba(226,87,127,.12);
+           background: linear-gradient(#fff, #fff) padding-box, linear-gradient(90deg, #ffb3c9, #ffe36e, #9fc3ff, #dfe6f1, #ff9494) border-box; }
+  .today .tname { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); padding: 2px 18px; white-space: nowrap;
+                  background: #fff; border: 3px solid #ffc2d4; border-radius: 999px; font-size: 17px; color: var(--pink); }
+  /* 最新のタブは6つ横1列（2026年11月15日 見本C）：YouTube・X・インスタ・ニュース・コンサート・出演 */
+  .tabs { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+  .tabs .tab .wd { overflow: hidden; text-overflow: clip; white-space: nowrap; letter-spacing: -0.5px; }
+  .tabs .tab { min-height: 56px; padding: 2px 0; }
+  .tabs .tab .wd { font-size: 10px; letter-spacing: -.06em; white-space: nowrap; }
+  .tabs .tab .ic { font-size: 17px; }
+  .mem-tabs .mt.one { flex: 0 0 100%; }
+  .ytm-head a.xb { border-color: #222; color: #222; }
+  .ytm-head a.ib { border-color: #d6366a; color: #d6366a; }
+  .snote { font-size: 12px; color: var(--sub); text-align: center; margin: 10px 4px 4px; line-height: 1.5; }
+  .checkmsg:empty { display: none; }
+  .fresh { margin: 0 0 18px; background: #fffdf2; border: 3px solid #ffe36e; border-radius: 18px; padding: 10px 12px 8px; box-shadow: 0 3px 10px rgba(255,200,80,.25); }
+  .fresh .fh { display: flex; align-items: center; justify-content: space-between; font-size: 16px; color: #b07a00; margin-bottom: 4px; }
+  .fresh .fh button { border: none; background: #fff3c4; color: #8a6d00; border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; min-height: 36px; cursor: pointer; }
+  .fresh a { display: flex; gap: 8px; align-items: flex-start; padding: 8px 2px; border-top: 2px dashed #ffeeb0; text-decoration: none; color: inherit; font-size: 14px; line-height: 1.45; }
+  .fresh a .fk { flex: 0 0 auto; font-size: 12px; background: #fff3c4; color: #8a6d00; border-radius: 999px; padding: 2px 8px; margin-top: 2px; }
+  .fresh a .go2 { flex: 0 0 auto; margin-left: auto; color: var(--pink); font-size: 13px; margin-top: 2px; }
+  .checkmsg { text-align: center; font-size: 13px; color: #a08888; margin: -4px 0 10px; }
+  /* 🎂 記念日カレンダーと当日のお祝い（2026年11月17日） */
+  .kinen { margin: 30px 0 8px; position: relative; background: #fff; border: 3px solid #ffc2d4; border-radius: 22px; padding: 22px 12px 10px; box-shadow: 0 3px 10px rgba(255,150,180,.18); }
+  .kinen > h3 { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #fff; border: 2px solid #ffc2d4; border-radius: 999px; padding: 2px 16px; font-size: 16px; color: var(--pink); white-space: nowrap; font-weight: normal; margin: 0; }
+  .kinen .kr { display: flex; align-items: center; gap: 10px; padding: 8px 4px; border-top: 2px dashed #ffe0ea; }
+  .kinen .kr:first-of-type { border-top: none; }
+  .kinen .kdot { width: 14px; height: 14px; border-radius: 50%; flex: 0 0 auto; border: 1px solid rgba(0,0,0,.08); }
+  .kinen .kd { min-width: 50px; font-size: 16px; }
+  .kinen .kn { flex: 1; min-width: 0; font-size: 14px; line-height: 1.4; }
+  .kinen .kn small { display: block; color: #a08888; font-size: 12px; white-space: pre-line; }
+  .kinen .kleft { font-size: 13px; background: #fff0f5; color: #d14d7a; border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+  .kinen .kr.today { background: var(--kc); border-radius: 14px; padding: 10px 8px; border-top: none; }
+  .kinen .kr.today + .kr { border-top: none; }
+  .kinen .kr.today .kleft { background: var(--pink-strong); color: #fff; }
+  .party { margin: 10px 0 6px; border-radius: 22px; padding: 16px 14px; text-align: center; background: linear-gradient(120deg,#ffe3ec,#fff6c9,#e3eeff); border: 3px solid #ffc2d4; position: relative; overflow: hidden; }
+  .party b { font-size: 22px; color: #e0507f; display: block; line-height: 1.4; font-weight: normal; }
+  .party small { font-size: 13px; color: #6b5555; }
+  .party .conf { position: absolute; font-size: 18px; opacity: .85; }
+  /* 🏠 公式サイトの NEWS（2026年11月18日） */
+  .ct { display: inline-block; border-radius: 999px; padding: 1px 8px; font-size: 11px; color: #fff; margin-right: 3px; }
+  .ct.c-MEDIA { background: #1f6fb2; } .ct.c-LIVE { background: #c2185b; } .ct.c-GOODS { background: #b85a12; } .ct.c-FC { background: #d14d7a; } .ct.c-RELEASE { background: #7a4dbf; } .ct.c-TICKET { background: #23794f; } .ct.c-OTHER { background: #8a6d5a; }
+  .offc { display: block; border: 2px solid #ffe0ea; border-radius: 16px; padding: 9px 11px; margin: 7px 0; background: #fff; text-decoration: none; color: inherit; position: relative; }
+  .offc .m { font-size: 12px; color: #8a6d5a; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+  .offc .t { font-size: 14px; line-height: 1.45; margin-top: 3px; }
+  .offc .nw { background: #ff5a8a; color: #fff; border-radius: 999px; padding: 0 6px; font-size: 11px; }
+  .offc .of { background: #ffe36e; color: #6b5500; border-radius: 999px; padding: 1px 8px; font-size: 11px; }
+  .offbox { position: relative; margin: 24px 0 18px; background: #fffdf6; border: 3px solid #ffe36e; border-radius: 20px; padding: 20px 10px 10px; }
+  .offbox > h3 { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); margin: 0; background: #fff; border: 2px solid #ffe36e; border-radius: 999px; padding: 2px 14px; font-size: 15px; color: #9a7b00; font-weight: normal; white-space: nowrap; }
+  .btn-offnews { display: block; text-align: center; border: 2px solid #ffc2d4; border-radius: 999px; padding: 9px; margin-top: 8px; font-size: 14px; color: var(--pink); background: #fff; text-decoration: none; min-height: 44px; box-sizing: border-box; }
+</style>
+</head>
+<body>
+<svg class="melt-top" id="meltTop" aria-hidden="true"></svg>
+<svg class="melt-bottom" id="meltBottom" aria-hidden="true"></svg>
+<div class="wrap">
+  <h1>🥛 M!LKポスト</h1>
+  <!-- 🎉 記念日の当日だけ出る大きなお祝い（2026年11月17日 見本B＋C） -->
+  <div id="party"></div>
+  <div class="last" id="last">最後に見回った時間：まだ見回っていません</div>
+  <div id="next"></div>
+  <div id="err"></div>
+
+  <div id="main">
+    <!-- 本日の放送・配信予定（2026年11月14日）：「いま見回る！」の上。押すと、その配信や番組のページに飛ぶ -->
+    <div id="today"></div>
+    <!-- 🤝 会える予定（公式）（2026年11月15日 見本A）。きょうの予定と公式サイト・SNSのあいだ。公式のお知らせから「会える」ものだけ -->
+    <div id="meet"></div>
+    <!-- SNSのボタンは、たためるようにした（2026年11月14日）。開いたか閉じたかは、このブラウザが覚えておく -->
+    <details class="sns-box" id="snsBox">
+    <summary>📱 公式サイト・SNS・TVer を見る</summary>
+    <div class="sns-inner">
+    <!-- M!LK 公式（2026年11月14日 見本C）。5人の色のふちの箱に、公式YouTube・公式サイト・インスタ・X -->
+    <div class="milk-box">
+      <p>🥛 M!LK 公式</p>
+      <div class="sns-grid">
+        <a class="sg yt" href="https://www.youtube.com/channel/UCHqQCpqvSOcHQr6Oqa4_5wg" target="_blank" rel="noopener">▶ 公式YouTube</a>
+        <a class="sg hp" href="https://sd-milk.com/" target="_blank" rel="noopener">🏠 公式サイト</a>
+        <a class="sg" href="https://www.instagram.com/milk_official_2014/" target="_blank" rel="noopener">📷 インスタ</a>
+        <a class="sg" href="https://x.com/milk_info" target="_blank" rel="noopener">📣 X</a>
+      </div>
+    </div>
+    <!-- メンバーの名前タブ。押すと、その人の公式ページ（スターダストプロモーションのプロフィール）・X・インスタ・YouTube が出る。
+         くわしくは 10_メンバーリンク調べ.md -->
+    <p class="mem-line">メンバーをえらんでね</p>
+    <div class="mem-tabs" id="memTabs"></div>
+    <div class="mem-links" id="memLinks"></div>
+    <!-- TVer（2026年11月14日）。TVer で「M!LK」を検索したページを開く。新しい番組を自動で見つけることはしない -->
+    <a class="btn-sns" href="https://tver.jp/search/M!LK" target="_blank" rel="noopener">📺 TVer で M!LK の番組を見る</a>
+    </div>
+    </details>
+    <button class="btn-check" id="btnCheck"><span class="milk">🥛</span> いま見回る！<small class="sub">YouTube・ニュースの最新を今すぐチェック</small></button>
+    <p class="checkmsg" id="checkMsg"></p>
+    <div id="fresh"></div>
+    <!-- 🏠 公式サイトの新しいお知らせ3件（2026年11月18日 見本C） -->
+    <div id="offBox"></div>
+
+    <!-- 新着は5人の色の細いふちで囲み、上のまん中に名札（2026年11月14日 見本C） -->
+    <section class="news-box">
+    <h2>🎀 最新</h2>
+    <div class="tabs" role="tablist">
+      <button class="tab on" id="tabYt" role="tab" type="button"><span class="ic">▶</span><span class="wd">YouTube</span></button>
+      <!-- 🏠 公式サイトの NEWS（2026年11月18日 見本A） -->
+      <button class="tab" id="tabOff" role="tab" type="button"><span class="ic">🏠</span><span class="wd">公式</span></button>
+      <!-- X・インスタのタブ（2026年11月15日 見本C）。投稿の一覧は出せないので、公式とメンバーの「開く」ボタンだけ -->
+      <button class="tab" id="tabX" role="tab" type="button"><span class="ic">𝕏</span><span class="wd">X</span></button>
+      <button class="tab" id="tabIg" role="tab" type="button"><span class="ic">📷</span><span class="wd">インスタ</span></button>
+      <button class="tab" id="tabNews" role="tab" type="button"><span class="ic">📰</span><span class="wd">ニュース</span></button>
+      <button class="tab" id="tabLive" role="tab" type="button"><span class="ic">🎤</span><span class="wd">コンサート</span></button>
+      <button class="tab" id="tabAppear" role="tab" type="button"><span class="ic">📺</span><span class="wd">出演</span></button>
+    </div>
+    <div id="items"><div class="empty">読みこみ中…</div></div>
+    </section>
+    <!-- 🎂 記念日カレンダー（2026年11月17日 見本B＋C）：「最新」の下。結成日と5人の誕生日を近い順に -->
+    <div id="kinen"></div>
+
+    <!-- よてい帳（2026年11月14日 追加）：配信・テレビ・ドラマ・ラジオの予定 -->
+    <h2 style="margin-top:22px" id="evTitle">🗓 よてい帳</h2>
+    <div id="cands"></div>
+    <details class="ev-form-box" id="evBox">
+      <summary>＋ 予定を入れる</summary>
+      <form id="evForm" autocomplete="off">
+        <label for="eName">なにを見る？</label>
+        <input id="eName" placeholder="例：ドラマ『溺愛』第5話" maxlength="100">
+        <div class="ev-row">
+          <div><label for="eDate">日にち</label><input id="eDate" type="date"></div>
+          <div><label for="eTime">時間</label><input id="eTime" type="time" value="20:00"></div>
+        </div>
+        <label>種類</label>
+        <div class="chips" id="eKind">
+          <button type="button" class="chip" data-v="youtube">▶ YouTube</button>
+          <button type="button" class="chip on" data-v="tv">📺 テレビ</button>
+          <button type="button" class="chip" data-v="drama">🎬 ドラマ</button>
+          <button type="button" class="chip" data-v="radio">📻 ラジオ</button>
+          <button type="button" class="chip" data-v="sns">📱 SNS配信</button>
+          <button type="button" class="chip" data-v="live">🎤 コンサート</button>
+        </div>
+        <label>くりかえし</label>
+        <div class="chips" id="eRepeat">
+          <button type="button" class="chip on" data-v="none">1回だけ</button>
+          <button type="button" class="chip" data-v="weekly">🔁 毎週</button>
+        </div>
+        <label>お知らせ（いくつでも）</label>
+        <div class="chips multi" id="eNotify">
+          <button type="button" class="chip" data-v="eve">前の日の夜</button>
+          <button type="button" class="chip on" data-v="30">30分前</button>
+          <button type="button" class="chip" data-v="10">10分前</button>
+          <button type="button" class="chip on" data-v="start">はじまる時間</button>
+        </div>
+        <label for="eUrl">リンク（なくてもOK）</label>
+        <input id="eUrl" placeholder="https://tver.jp/…" maxlength="500">
+        <button class="btn-add" type="submit">よてい帳に入れる</button>
+        <div class="form-msg" id="evMsg"></div>
+      </form>
+    </details>
+    <div id="evs"></div>
+
+    <h2 style="margin-top:22px" id="dlTitle">📅 しめきり帳</h2>
+    <form id="form" autocomplete="off">
+      <label for="fName">なにの締め切り？</label>
+      <input id="fName" placeholder="例：冬ライブ 申し込み" maxlength="100">
+      <label for="fDate">締め切りの日</label>
+      <input id="fDate" type="date">
+      <label for="fUrl">URL（なくてもOK）</label>
+      <input id="fUrl" placeholder="https://" maxlength="500">
+      <button class="btn-add" type="submit">登録する</button>
+      <div class="form-msg" id="formMsg"></div>
+    </form>
+    <div id="dls"></div>
+
+    <div class="foot">
+      <button class="btn-test" id="btnTest">スマホにテスト通知を送る</button>
+      <p id="testMsg">ntfy アプリで受け取れるか確かめるときに使います</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+// ===== とろけるミルク（2026年11月14日）：上は「I-4 ぽってり」、下は「C ミルクだまり」 =====
+// しずくの色は左から 佐野→吉田→塩﨑→山中→曽野（メンバーカラーをやさしくした色）
+const DROP_COLORS = ["#ffb3c9", "#ffe36e", "#9fc3ff", "#e6ecf5", "#ff9494"];
+function meltTopPath(width, base = 24, f = 14, amp = 6) {
+  // 右によせた5本のしずく（大きさはどの画面でも同じ）
+  const drips = [[width - 186, 22, 40], [width - 138, 20, 28], [width - 94, 26, 56], [width - 52, 22, 38], [width - 12, 24, 64]];
+  let d = `M0 -40 H${width} V${base} `, cur = width, up = true;
+  for (const [x, w, dep] of [...drips].sort((a, b) => b[0] - a[0])) {
+    const r = w / 2, neck = w * 0.42, xr = x + r, xl = x - r, sx = x + neck + f;
+    const mid = (cur + sx) / 2, yy = base + (up ? amp : -amp * 0.6); up = !up;
+    d += `C${cur - (cur - mid) * 0.5} ${base} ${mid + (cur - mid) * 0.4} ${yy} ${mid} ${yy} C${mid - (mid - sx) * 0.4} ${yy} ${sx + (mid - sx) * 0.5} ${base} ${sx} ${base} `;
+    d += `C${x + neck + f * 0.3} ${base} ${x + neck} ${base + f * 0.4} ${x + neck} ${base + f} C${x + neck} ${base + dep * 0.55} ${xr} ${base + dep - r * 1.7} ${xr} ${base + dep - r} `;
+    d += `A${r} ${r} 0 0 1 ${xl} ${base + dep - r} C${xl} ${base + dep - r * 1.7} ${x - neck} ${base + dep * 0.55} ${x - neck} ${base + f} C${x - neck} ${base + f * 0.4} ${x - neck - f * 0.3} ${base} ${x - neck - f} ${base} `;
+    cur = x - neck - f;
+  }
+  const n = Math.max(1, Math.floor(cur / 90)), seg = cur / n;   // 左がわは、ゆるい波
+  for (let i = 0; i < n; i++) {
+    const a = cur - seg * i, b = cur - seg * (i + 1), yy = base + (i % 2 === 0 ? amp : -amp * 0.5);
+    d += `C${a - seg * 0.3} ${base} ${b + seg * 0.6} ${yy} ${(a + b) / 2} ${yy} C${b + seg * 0.3} ${yy} ${b + seg * 0.2} ${base} ${b} ${base} `;
+  }
+  const drops = drips.map(([x, w, dep], i) => `<ellipse cx="${x}" cy="${base + dep + 11}" rx="5.5" ry="7" fill="${DROP_COLORS[i]}" stroke="rgba(226,87,127,.2)"/>`).join("");
+  return { d: d + "Z", drops };
+}
+function meltBottomPath(width, h = 120, level = 40, amp = 7) {
+  // 下にたまったミルク。左がわに5人の色のしずくがぽちゃん
+  const y0 = h - level, n = Math.max(2, Math.round(width / 60)), seg = width / n;
+  let d = `M0 ${h + 40} V${y0} `;
+  for (let i = 0; i < n; i++) {
+    const a = seg * i, b = seg * (i + 1), yy = y0 + (i % 2 === 0 ? -amp : amp * 0.6);
+    d += `C${a + seg * 0.3} ${y0} ${b - seg * 0.6} ${yy} ${(a + b) / 2} ${yy} C${b - seg * 0.3} ${yy} ${b - seg * 0.2} ${y0} ${b} ${y0} `;
+  }
+  const pos = [[30, 40], [62, 58], [96, 36], [130, 62], [164, 46]];
+  const drops = pos.map(([x, y], i) => `<ellipse cx="${x}" cy="${y}" rx="5.5" ry="7" fill="${DROP_COLORS[i]}" stroke="rgba(226,87,127,.2)"/>`).join("");
+  return { d: d + `V${h + 40} Z`, drops };
+}
+function drawMilk() {
+  const w = Math.max(240, Math.round(document.body.clientWidth));
+  const t = meltTopPath(w), b = meltBottomPath(w);
+  const shape = (d, dy) => `<path d="${d}" fill="#fff" stroke="rgba(226,87,127,.25)" stroke-width="1.4"/><path d="${d}" fill="none" stroke="rgba(255,255,255,.95)" stroke-width="1.2" transform="translate(0,${dy})"/>`;
+  $("meltTop").setAttribute("viewBox", `0 0 ${w} 124`);
+  $("meltTop").innerHTML = shape(t.d, -2) + t.drops;
+  $("meltBottom").setAttribute("viewBox", `0 0 ${w} 120`);
+  $("meltBottom").innerHTML = shape(b.d, 2) + b.drops;
+}
+drawMilk();
+window.addEventListener("resize", drawMilk);
+let state = null;
+let showAll = false;
+let showAllNews = false;
+// 新着の「YouTube／ニュース」どちらを見ていたかを、このブラウザに覚えておく
+let tab = "yt";
+try { const t = localStorage.getItem("mp_tab"); if (["news", "live", "appear", "x", "ig", "off"].includes(t)) tab = t; } catch (e) {}
+let showAllLive = false;
+const SHOW_N = 5;   // 新着の一覧は、はじめは5件だけ見せる。のこりは「もっと見る」（2026年11月14日 見本A）
+// ショート動画には「📱 ショート」の印（2026年11月16日）
+const isShort = (v) => /youtube\.com\/shorts\//.test(v.url || "");
+function ytTag(v) {
+  if (isShort(v)) return `<span class="tag short">📱 ショート</span>`;
+  const k = v.kind || "動画";
+  return `<span class="tag ${k === "配信" ? "live" : ""}">${esc(k)}</span>`;
+}
+let ytCat = "new", showAllYtVid = false;   // ▶ YouTube の中の小タブ
+try { const v = localStorage.getItem("mp_ytcat"); if (v === "video" || /^m[0-4]$/.test(v || "")) ytCat = v; } catch (e) {}
+let showAllYtMem = false;
+// メンバー個人の YouTube（2026年11月15日）。名前タブを押すと、その人のチャンネルの新しい動画を出す
+const YT_NOTE = { "じんだいチャンネル": "吉田仁人さんと塩﨑太智さん、2人のチャンネル" };
+// X・インスタのタブで、だれをえらんでいるか（-1＝M!LK公式、0〜4＝メンバー）。このブラウザが覚えておく
+const snsSel = { x: -1, ig: -1 };
+try { for (const k of ["x", "ig"]) { const v = localStorage.getItem("mp_" + k + "sel"); if (v !== null && +v >= -1 && +v < 5) snsSel[k] = +v; } } catch (e) {}
+function renderSnsTab(k) {
+  const isX = k === "x", nm = isX ? "X" : "インスタ", ic = isX ? "𝕏" : "📷", cls = isX ? "xb" : "ib";
+  const off = isX ? "https://x.com/milk_info" : "https://www.instagram.com/milk_official_2014/";
+  const at = u => "@" + u.replace(/\/$/, "").split("/").pop();
+  const sel = snsSel[k];
+  const band = (title, u, col) => `<div class="ytm-head ${col ? "" : "milkh"}" ${col ? `style="--mc:${col}"` : ""}><div><b>${ic} ${title}</b><small>${esc(at(u))}</small></div>`
+    + `<a class="${cls}" href="${esc(u)}" target="_blank" rel="noopener">${nm}を開く ›</a></div>`;
+  let h = `<div class="mem-tabs"><button type="button" class="mt milk one ${sel < 0 ? "on" : ""}" data-snssel="-1">🥛 M!LK公式</button></div>`;
+  if (sel < 0) h += band(`M!LK 公式 ${nm}`, off);
+  h += `<p class="mem-line">メンバーの ${nm}</p><div class="mem-tabs">${MEMBER_LINKS.map((m, i) =>
+    `<button type="button" class="mt ${sel === i ? "on" : ""}" data-snssel="${i}" style="--mc:${m.col}">${m.name}</button>`).join("")}</div>`;
+  if (sel >= 0) { const m = MEMBER_LINKS[sel]; h += band(`${m.name}の${nm}`, isX ? m.x : m.ig, m.col); }
+  h += `<p class="snote">${nm}の投稿は、お金のかからない方法では自動で集められないので、<br>ボタンで${nm}を開いて見てね</p>`;
+  $("items").innerHTML = h;
+  document.querySelectorAll("[data-snssel]").forEach(b => b.onclick = () => {
+    snsSel[k] = +b.dataset.snssel; try { localStorage.setItem("mp_" + k + "sel", snsSel[k]); } catch (e) {} render();
+  });
+}
+function setTab(t) {
+  tab = t;
+  try { localStorage.setItem("mp_tab", t); } catch (e) {}
+  if (state) render();
+}
+
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function md(s) { // "2026-11-13..." → "11月13日"
+  const m = /^\d{4}-(\d{2})-(\d{2})/.exec(s || "");
+  return m ? `${+m[1]}月${+m[2]}日` : "";
+}
+function mdhm(s) { // "2026-11-13 21:00" → "11月13日 21:00"
+  return s ? `${md(s)} ${s.slice(11, 16)}` : "";
+}
+function safeUrl(u) { return /^https?:\/\//i.test(u || "") ? u : ""; }
+function pad(n) { return String(n).padStart(2, "0"); }
+function ymd(t) { return `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`; }
+function nowStr() { const t = new Date(); return `${ymd(t)} ${pad(t.getHours())}:${pad(t.getMinutes())}`; }
+function localDay(iso) { // 動画の公開日（世界時間）→ 日本の日にち "2026-11-13"
+  const t = new Date(iso || "");
+  return isNaN(t) ? "" : ymd(t);
+}
+function mdw(s) { // "2026-11-20" → "11月20日（金）"
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || "");
+  if (!m) return "";
+  const w = "日月火水木金土"[new Date(+m[1], +m[2] - 1, +m[3]).getDay()];
+  return `${+m[2]}月${+m[3]}日（${w}）`;
+}
+function dayLabel(day) {
+  const t = new Date();
+  const today = ymd(t);
+  t.setDate(t.getDate() - 1);
+  if (day === today) return "🍼 きょう";
+  if (day === ymd(t)) return "きのう";
+  return "もっと前";
+}
+// アイデア5：前に画面を開いた時間を覚えておき、それより後に見つけた新着に点をつける
+// SNSの箱を開いたか閉じたかを、このブラウザに覚えておく
+try {
+  if (localStorage.getItem("mp_sns_open") === "1") $("snsBox").open = true;
+  $("snsBox").addEventListener("toggle", () => {
+    try { localStorage.setItem("mp_sns_open", $("snsBox").open ? "1" : "0"); } catch (e) {}
+  });
+} catch (e) {}
+// メンバーごとのリンク（2026年11月14日）。色は MEMBER_COLORS と同じ
+const MEMBER_LINKS = [
+  { name: "吉田仁人", col: "#ffe36e", hp: "https://www.stardust.co.jp/talent/section3/yoshidajinto/", x: "https://x.com/Y_Jinto_1215", ig: "https://www.instagram.com/yoshida_jinto_milk/", yt: "https://www.youtube.com/@%E3%81%98%E3%82%93%E3%81%A0%E3%81%84%E3%83%81%E3%83%A3%E3%83%B3%E3%83%8D%E3%83%AB", ytName: "じんだいチャンネル" },
+  { name: "佐野勇斗", col: "#ffb3c9", hp: "https://www.stardust.co.jp/talent/section2/sanohayato/", x: "https://x.com/sanohayatodazo", ig: "https://www.instagram.com/sanohayato_milk/", yt: "https://www.youtube.com/@sanohayatodazo", ytName: "佐野勇斗だぞ" },
+  { name: "塩﨑太智", col: "#9fc3ff", hp: "https://www.stardust.co.jp/talent/section3/shiozakidaichi/", x: "https://x.com/shiozaki__info", ig: "https://www.instagram.com/shiozakidaichi0911_milk/", yt: "https://www.youtube.com/@%E3%81%98%E3%82%93%E3%81%A0%E3%81%84%E3%83%81%E3%83%A3%E3%83%B3%E3%83%8D%E3%83%AB", ytName: "じんだいチャンネル" },
+  { name: "曽野舜太", col: "#ff9494", hp: "https://www.stardust.co.jp/talent/section3/sonoshunta/", x: "https://x.com/sonoshunta0503", ig: "https://www.instagram.com/sonoshunta_milk/", yt: "https://www.youtube.com/@Im_SONO_SHUNTA", ytName: "I'm 曽野舜太" },
+  { name: "山中柔太朗", col: "#dfe6f1", hp: "https://www.stardust.co.jp/talent/section3/yamanakajyutaro/", x: "https://x.com/jyu_ta_ro", ig: "https://www.instagram.com/jyutaro_milk/", yt: "https://www.youtube.com/@jyutaro_the_movie", ytName: "劇場版 じゅうたろう" },
+];
+let memSel = 0;
+try { const v = +localStorage.getItem("mp_mem"); if (v >= 0 && v < MEMBER_LINKS.length) memSel = v; } catch (e) {}
+function renderMembers() {
+  $("memTabs").innerHTML = MEMBER_LINKS.map((m, i) =>
+    `<button type="button" class="mt ${i === memSel ? "on" : ""}" data-mem="${i}" style="--mc:${m.col}">${m.name}</button>`).join("");
+  const m = MEMBER_LINKS[memSel];
+  const a = (href, label, cls = "") => `<a class="sg ${cls}" href="${href}" target="_blank" rel="noopener">${label}</a>`;
+  $("memLinks").innerHTML = `<div class="sns-grid" style="--mc:${m.col}">`
+    + a(m.hp, "⭐ 公式ページ", "hp") + a(m.x, "📣 X") + a(m.ig, "📷 インスタ") + a(m.yt, `▶ YouTube<small>${m.ytName}</small>`, "yt")
+    + `</div>`;
+  document.querySelectorAll("[data-mem]").forEach(b => b.onclick = () => {
+    memSel = +b.dataset.mem; try { localStorage.setItem("mp_mem", memSel); } catch (e) {} renderMembers();
+  });
+}
+renderMembers();
+let prevSeen = null;
+try { prevSeen = localStorage.getItem("mp_last_seen"); localStorage.setItem("mp_last_seen", nowStr()); } catch (e) {}
+function countBadge(left) {
+  if (left === null || left === undefined) return "";
+  if (left < 0) return `<div class="count over"><strong style="font-size:16px">終了</strong></div>`;
+  if (left === 0) return `<div class="count soon today"><small>今日</small><strong>まで!</strong></div>`;
+  const cls = left <= 3 ? "soon" : left <= 7 ? "week" : "";
+  return `<div class="count ${cls}"><small>あと</small><strong>${left}</strong><small>日</small></div>`;
+}
+
+async function api(path, opt = {}) {
+  const res = await fetch(path, { headers: { "Content-Type": "application/json" }, ...opt });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "うまくいきませんでした");
+  return data;
+}
+
+function render() {
+  const s = state;
+  $("last").textContent = "最後に見回った時間：" + (s.last_check ? mdhm(s.last_check) : "まだ見回っていません");
+  let info = "";
+  if (s.dry_run) info += `<div class="info">いまは「ためし運転」中です。通知は本当には送りません。</div>`;
+  if (s.pending) info += `<div class="info">まとめて知らせる動画が ${s.pending} 本あります（8時・12時・21時にお知らせ）</div>`;
+  $("err").innerHTML = (s.last_error ? `<div class="err">${esc(s.last_error)}</div>` : "") + info;
+
+  // アイデア3：いちばん近い締め切りを、いちばん上の帯に出す
+  const nextDl = s.deadlines.find(d => d.left !== null && d.left >= 0);
+  $("next").innerHTML = nextDl
+    ? `<button class="next" id="btnNext">📅<span class="nm">${esc(nextDl.name)}</span><b>${nextDl.left === 0 ? "今日まで！" : `あと${nextDl.left}日`}</b></button>`
+    : "";
+  if (nextDl) $("btnNext").onclick = () => $("dlTitle").scrollIntoView({ behavior: "smooth" });
+
+  // 新着の「YouTube／ニュース」切りかえ（2026年11月14日 案B）
+  $("tabYt").classList.toggle("on", tab === "yt");
+  $("tabNews").classList.toggle("on", tab === "news");
+  $("tabLive").classList.toggle("on", tab === "live");
+  $("tabYt").setAttribute("aria-selected", tab === "yt");
+  $("tabNews").setAttribute("aria-selected", tab === "news");
+  $("tabLive").setAttribute("aria-selected", tab === "live");
+  $("tabAppear").classList.toggle("on", tab === "appear");
+  $("tabAppear").setAttribute("aria-selected", tab === "appear");
+  for (const [id, k] of [["tabX", "x"], ["tabIg", "ig"], ["tabOff", "off"]]) { $(id).classList.toggle("on", tab === k); $(id).setAttribute("aria-selected", tab === k); }
+  if (tab === "x" || tab === "ig") { renderSnsTab(tab); renderDeadlines(s); return; }
+  if (tab === "off") { renderOffTab(s); renderDeadlines(s); return; }
+  if (tab === "news") { renderNewsCats(s); return; }
+  if (tab === "live") { renderLiveOfficial(s); return; }
+  if (tab === "appear") { renderAppearOfficial(s); return; }
+
+  // ▶ YouTube の中のタブ（2026年11月15日 見本D）
+  //   1段目：🥛 M!LK公式（＝公式の新着の動画）／🎥 動画・インタビュー。M!LK を押すと、すぐ下に「チャンネルへ」
+  //   その下：メンバーの YouTube の名前タブ（上3人・下2人）
+  const ytTop = `<div class="mem-tabs two">`
+      + `<button type="button" class="mt milk ${ytCat === "new" ? "on" : ""}" data-ytcat="new">🥛 M!LK公式</button>`
+      + `<button type="button" class="mt vid ${ytCat === "video" ? "on" : ""}" data-ytcat="video">🎥 動画・インタビュー</button></div>`
+    + (ytCat === "new" ? `<div class="ytm-head milkh"><div><b>▶ M!LK 公式</b><small>M!LK 公式の YouTube チャンネル</small></div>`
+      + `<a href="https://www.youtube.com/channel/UCHqQCpqvSOcHQr6Oqa4_5wg" target="_blank" rel="noopener">チャンネルへ ›</a></div>` : "")
+    + `<p class="mem-line">メンバーの YouTube</p><div class="mem-tabs">${MEMBER_LINKS.map((m, i) =>
+        `<button type="button" class="mt ${ytCat === "m" + i ? "on" : ""}" data-ytcat="m${i}" style="--mc:${m.col}">${m.name}</button>`).join("")}</div>`;
+  const bindYt = () => document.querySelectorAll("[data-ytcat]").forEach(b => b.onclick = () => {
+    ytCat = b.dataset.ytcat; showAllYtMem = false; try { localStorage.setItem("mp_ytcat", ytCat); } catch (e) {} render();
+  });
+  if (/^m[0-4]$/.test(ytCat)) {
+    // 🎬 メンバー個人の YouTube
+    const m = MEMBER_LINKS[+ytCat.slice(1)];
+    const vids = (s.member_yt || {})[m.ytName] || [];
+    const shownM = showAllYtMem ? vids : vids.slice(0, SHOW_N);
+    let lastM = "";
+    $("items").innerHTML = ytTop
+      + `<div class="ytm-head" style="--mc:${m.col}"><div><b>▶ ${esc(m.ytName)}</b>${YT_NOTE[m.ytName] ? `<small>${esc(YT_NOTE[m.ytName])}</small>` : ""}</div>`
+      + `<a href="${esc(safeUrl(m.yt))}" target="_blank" rel="noopener">チャンネルへ ›</a></div>`
+      + (vids.length === 0 ? `<div class="empty">🎬 まだ動画を集めていないよ。つぎの見回りまで待ってね</div>` : shownM.map(v => {
+          const day = localDay(v.published); const label = dayLabel(day);
+          const head = label !== lastM ? `<p class="day">${label}</p>` : ""; lastM = label;
+          return `${head}<a class="item" href="${esc(safeUrl(v.url))}" target="_blank" rel="noopener">
+            <div class="meta">${ytTag(v)}${esc(md(day))}</div><div class="ttl">${esc(v.title)}</div></a>`;
+        }).join(""))
+      + (vids.length > SHOW_N && !showAllYtMem ? `<button class="more" id="btnMore">もっと見る（あと ${vids.length - SHOW_N} 件）</button>` : "");
+    bindYt();
+    const mm = $("btnMore");
+    if (mm) mm.onclick = () => { showAllYtMem = true; render(); };
+    renderDeadlines(s);
+    return;
+  }
+  if (ytCat === "video") {
+    const vids = groupArticles([...(s.news || []), ...(s.appear || []), ...(s.live || []), ...(s.video || [])]).filter(n => catOfItem(n) === "video");
+    const shownV = showAllYtVid ? vids : vids.slice(0, SHOW_N);
+    let lastV = "";
+    $("items").innerHTML = ytTop + (vids.length === 0 ? `<div class="empty">🎥 動画・インタビューの記事は、まだないよ</div>` : shownV.map(n => {
+        const t = new Date(n.published || ""); const label = dayLabel(isNaN(t) ? "" : ymd(t));
+        const head = label !== lastV ? `<p class="day">${label}</p>` : ""; lastV = label;
+        return head + articleCard(n);
+      }).join(""))
+      + (vids.length > SHOW_N && !showAllYtVid ? `<button class="more" id="btnMore">もっと見る（あと ${vids.length - SHOW_N} 件）</button>` : "");
+    bindYt();
+    const mv = $("btnMore");
+    if (mv) mv.onclick = () => { showAllYtVid = true; render(); };
+    renderDeadlines(s);
+    return;
+  }
+
+  // アイデア4：新着を「きょう／きのう／もっと前」で区切る
+  const list = showAll ? s.items : s.items.slice(0, SHOW_N);
+  let lastLabel = "";
+  $("items").innerHTML = ytTop + (s.items.length === 0
+    ? `<div class="empty">🥛 いまは新しいお知らせはないよ。<br>見回りはつづけているから安心してね</div>`
+    : list.map(v => {
+        const day = localDay(v.published);
+        const label = dayLabel(day);
+        const head = label !== lastLabel ? `<p class="day">${label}</p>` : "";
+        lastLabel = label;
+        const isNew = prevSeen && v.found_at && v.found_at > prevSeen;
+        return `${head}
+      <a class="item ${v.kind === "配信" ? "live" : ""}" href="${esc(safeUrl(v.url))}" target="_blank" rel="noopener">
+        ${isNew ? `<span class="dot" title="まだ見ていない最新"></span>` : ""}
+        <div class="meta">${ytTag(v)}${esc(md(day))}</div>
+        <div class="ttl">${esc(v.title)}</div>
+      </a>`;
+      }).join("")
+      + (s.items.length > SHOW_N && !showAll ? `<button class="more" id="btnMore">もっと見る（あと ${s.items.length - SHOW_N} 件）</button>` : ""));
+  bindYt();
+  const more = $("btnMore");
+  if (more) more.onclick = () => { showAll = true; render(); };
+  renderDeadlines(s);
+}
+
+// ニュース一覧。同じ話題の記事は1つにまとめて「ほか ◯ 件」と出す
+function newsKey(t) { return String(t || "").replace(/[\s・、。！!？?「」『』（）()【】［］\[\]〜~…:：|｜]/g, "").slice(0, 18); }
+function renderNews(s) {
+  const news = s.news || [];
+  const groups = [];
+  const byKey = {};
+  for (const n of news) {
+    const k = newsKey(n.title);
+    if (byKey[k]) { byKey[k].more++; continue; }
+    byKey[k] = { ...n, more: 0 };
+    groups.push(byKey[k]);
+  }
+  const list = showAllNews ? groups : groups.slice(0, SHOW_N);
+  let lastLabel = "";
+  const err = s.news_error ? `<div class="info">${esc(s.news_error)}</div>` : "";
+  $("items").innerHTML = err + (groups.length === 0
+    ? `<div class="empty">📰 ニュースは、まだ集まっていないよ。<br>「いま見回る！」を押すと、すぐ集めるよ</div>`
+    : list.map(n => {
+        const t = new Date(n.published || "");
+        const day = isNaN(t) ? "" : ymd(t);
+        const label = dayLabel(day);
+        const head = label !== lastLabel ? `<p class="day">${label}</p>` : "";
+        lastLabel = label;
+        const isNew = prevSeen && n.found_at && n.found_at > prevSeen;
+        const when = isNaN(t) ? "" : `${t.getMonth() + 1}月${t.getDate()}日 ${pad(t.getHours())}:${pad(t.getMinutes())}`;
+        return `${head}
+      <a class="item news" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
+        ${isNew ? `<span class="dot" title="まだ見ていない最新"></span>` : ""}
+        <div class="meta"><span class="tag src">${esc(n.source || "ニュース")}</span><span class="when">${esc(when)}</span>${n.more ? `<span class="more2">ほか ${n.more} 件</span>` : ""}</div>
+        <div class="ttl">${esc(n.title)}</div>
+      </a>`;
+      }).join("")
+      + (groups.length > SHOW_N && !showAllNews ? `<button class="more" id="btnMore">もっと見る（あと ${groups.length - SHOW_N} 件）</button>` : ""));
+  const more = $("btnMore");
+  if (more) more.onclick = () => { showAllNews = true; render(); };
+  renderDeadlines(s);
+}
+
+// 出てくるメンバーの色の丸（2026年11月14日）。メンバーカラーは UtaTen の記事より。全員（M!LK）のときは5色
+const MEMBER_COLORS = [["佐野", "#ffb3c9"], ["吉田", "#ffe36e"], ["塩﨑", "#9fc3ff"], ["塩崎", "#9fc3ff"], ["山中", "#dfe6f1"], ["曽野", "#ff9494"]];
+function memberDots(title) {
+  let cols = [];
+  for (const [name, col] of MEMBER_COLORS) if (title.includes(name) && !cols.includes(col)) cols.push(col);
+  if (cols.length === 0 || /【M!LK】|【Ｍ！ＬＫ】/.test(title)) cols = ["#ffb3c9", "#ffe36e", "#9fc3ff", "#dfe6f1", "#ff9494"];
+  return `<span class="mem">${cols.map(c => `<i style="background:${c}"></i>`).join("")}</span>`;
+}
+
+// ライブ情報・出演情報：公式サイトのお知らせとニュースをまぜて出す。公式は「⭐ 公式」でピンクのカード
+const TOPICS = {
+  live: { btn: `<a class="btn-official" href="https://sd-milk.com/contents/schedule?data=live" target="_blank" rel="noopener">🎟 M!LK公式のライブ予定を見る</a>`,
+          empty: "🎤 ライブ情報は、まだ集まっていないよ。" },
+  appear: { btn: `<a class="btn-official" href="https://sd-milk.com/contents/schedule?data=media" target="_blank" rel="noopener">📺 M!LK公式のテレビ・雑誌の予定を見る</a>`,
+            empty: "📺 出演情報は、まだ集まっていないよ。" },
+};
+let showAllTopic = { live: false, appear: false };
+function renderLive(s) { renderTopic(s, "live"); }
+function renderTopic(s, key) {
+  const conf = TOPICS[key];
+  const live = s[key] || [];
+  const groups = [];
+  const byKey = {};
+  for (const n of live) {
+    const k = newsKey(n.title);
+    if (byKey[k]) { byKey[k].more++; if (n.official) byKey[k].official = true; continue; }
+    byKey[k] = { ...n, more: 0 };
+    groups.push(byKey[k]);
+  }
+  const list = showAllTopic[key] ? groups : groups.slice(0, SHOW_N);
+  let lastLabel = "";
+  $("items").innerHTML = conf.btn + (groups.length === 0
+    ? `<div class="empty">${conf.empty}<br>「いま見回る！」を押すと、すぐ集めるよ</div>`
+    : list.map(n => {
+        const t = new Date(n.published || "");
+        const day = isNaN(t) ? "" : ymd(t);
+        const label = dayLabel(day);
+        const head = label !== lastLabel ? `<p class="day">${label}</p>` : "";
+        lastLabel = label;
+        const isNew = prevSeen && n.found_at && n.found_at > prevSeen;
+        const when = isNaN(t) ? "" : `${t.getMonth() + 1}月${t.getDate()}日`;
+        const badge = n.official ? `<span class="tag official">⭐ 公式</span>` : `<span class="tag src">${esc(n.source || "ニュース")}</span>`;
+        return `${head}
+      <a class="item news ${n.official ? "official" : ""}" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
+        ${isNew ? `<span class="dot" title="まだ見ていない最新"></span>` : ""}
+        <div class="meta">${badge}<span class="when">${esc(when)}</span>${n.more ? `<span class="more2">ほか ${n.more} 件</span>` : ""}${key === "appear" ? memberDots(n.title) : ""}</div>
+        <div class="ttl">${esc(n.title)}</div>
+      </a>`;
+      }).join("")
+      + (groups.length > SHOW_N && !showAllTopic[key] ? `<button class="more" id="btnMore">もっと見る（あと ${groups.length - SHOW_N} 件）</button>` : ""))
+    + `<p class="info" style="text-align:center">公式のお知らせが全部ここに出るとは限りません。大事なことは公式サイトでも確かめてね</p>`;
+  const more = $("btnMore");
+  if (more) more.onclick = () => { showAllTopic[key] = true; render(); };
+  renderDeadlines(s);
+}
+
+// ===== 記事の種類分け（2026年11月14日）=====
+// 📰ニュース：全部の記事を種類ごとの小さなタブで分ける ／ 🎤ライブ：公式のライブ・コンサート情報だけ ／ 📺出演：公式のお知らせをドラマ・バラエティなどに分ける
+const VIDEO_RE = /インタビュー|予告|番宣|【動画】|動画あり|動画解禁|動画公開|映像|メイキング|メーキング|CM|ムービー|TVer|YouTube/;
+const CATS = [
+  ["video", "🎥 動画・インタビュー", VIDEO_RE],
+  ["drama", "🎬 ドラマ", /ドラマ|主演|第\d+話|映画|朗読劇|舞台/],
+  ["live", "🎤 コンサート", /ライブ|LIVE|ツアー|TOUR|公演|コンサート|フェス|FES|チケット|会場|ファンミ/i],
+  ["radio", "📻 ラジオ", /ラジオ|ニッポン放送|オールナイトニッポン|文化放送|レコメン|FM|AM/],
+  ["magazine", "📖 雑誌", /表紙|雑誌|号|グラビア|誌|インタビュー/],
+  ["music", "🎵 音楽", /新曲|シングル|アルバム|ALBUM|MV|リリース|チャート|Billboard|楽曲|配信スタート|ストリーミング/],
+  ["tv", "📺 テレビ", /番組|放送|バラエティ|紅白|歌番組|歌謡祭|Mステ|テレビ|特番|冠|出演|生出演|TVer/],
+];
+const CAT_OTHER = ["other", "💬 話題・写真"];
+// 記事の種類。video=false のときは「動画・インタビュー」に分けない（出演のタブ用）
+function catOf(title, source = "", video = true) {
+  if (video && /^(TVer|YouTube)$/.test(source || "")) return "video";
+  for (const [k, , re] of CATS) { if (k === "video" && !video) continue; if (re.test(title || "")) return k; }
+  return "other";
+}
+const catOfItem = (n) => catOf(n.title, n.source);
+function catLabel(k) { const c = CATS.find(x => x[0] === k); return c ? c[1] : CAT_OTHER[1]; }
+function cleanKey(t) { return newsKey(String(t || "").replace(/^プレスリリース：/, "")); }
+function groupArticles(list, exact = false) {   // 同じ話題の記事は1つにまとめて「ほか◯件」（exact：題名がまったく同じものだけ）
+  const out = [], by = {};
+  for (const n of [...list].sort((a, b) => (b.published || "").localeCompare(a.published || ""))) {
+    const k = exact ? String(n.title || "").replace(/^プレスリリース：/, "") : cleanKey(n.title);
+    if (by[k]) { by[k].more++; if (n.official) by[k].official = true; continue; }
+    by[k] = { ...n, title: String(n.title || "").replace(/^プレスリリース：/, ""), more: 0, official: n.official || /オフィシャル/.test(n.source || "") };
+    out.push(by[k]);
+  }
+  return out;
+}
+function articleCard(n, opts = {}) {
+  const t = new Date(n.published || "");
+  const day = isNaN(t) ? "" : `${t.getMonth() + 1}月${t.getDate()}日`;
+  const isNew = prevSeen && n.found_at && n.found_at > prevSeen;
+  const badge = n.official ? `<span class="tag official">⭐ 公式</span>` : `<span class="tag src">${esc(n.source || "ニュース")}</span>`;
+  const cat = opts.showCat ? `<span class="cattag c-${catOfItem(n)}">${catLabel(catOfItem(n))}</span>` : "";
+  return `<a class="item news ${n.official ? "official" : ""}" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener">
+      ${isNew ? `<span class="dot" title="まだ見ていない最新"></span>` : ""}
+      <div class="meta">${badge}<span class="when">${esc(day)}</span>${cat}${n.more ? `<span class="more2">ほか ${n.more} 件</span>` : ""}${opts.dots ? memberDots(n.title) : ""}</div>
+      <div class="ttl">${esc(n.title)}</div>
+    </a>`;
+}
+let newsCat = "all";
+try { newsCat = localStorage.getItem("mp_newscat") || "all"; } catch (e) {}
+let showAllCat = false;
+function renderNewsCats(s) {
+  const all = groupArticles([...(s.news || []), ...(s.appear || []), ...(s.live || []), ...(s.video || [])]);
+  const counts = {};
+  for (const n of all) { const k = catOfItem(n); counts[k] = (counts[k] || 0) + 1; }
+  const chips = [["all", "すべて"], ...CATS.map(c => [c[0], c[1]]), CAT_OTHER]
+    .filter(([k]) => k === "all" || counts[k])
+    .map(([k, l]) => `<button type="button" class="chip ${newsCat === k ? "on" : ""}" data-cat="${k}">${l}${k === "all" ? "" : ` <small>${counts[k]}</small>`}</button>`).join("");
+  const list = newsCat === "all" ? all : all.filter(n => catOfItem(n) === newsCat);
+  const shown = showAllCat ? list : list.slice(0, SHOW_N);
+  let lastLabel = "";
+  const body = shown.map(n => {
+    const t = new Date(n.published || ""); const label = dayLabel(isNaN(t) ? "" : ymd(t));
+    const head = label !== lastLabel ? `<p class="day">${label}</p>` : ""; lastLabel = label;
+    return head + articleCard(n, { showCat: newsCat === "all" });
+  }).join("");
+  $("items").innerHTML = `<div class="chips cats">${chips}</div>`
+    + (list.length === 0 ? `<div class="empty">📰 この種類の記事は、まだないよ</div>` : body)
+    + (list.length > SHOW_N && !showAllCat ? `<button class="more" id="btnMore">もっと見る（あと ${list.length - SHOW_N} 件）</button>` : "");
+  document.querySelectorAll("[data-cat]").forEach(b => b.onclick = () => {
+    newsCat = b.dataset.cat; showAllCat = false;
+    try { localStorage.setItem("mp_newscat", newsCat); } catch (e) {}
+    render();
+  });
+  const more = $("btnMore");
+  if (more) more.onclick = () => { showAllCat = true; render(); };
+  renderDeadlines(s);
+}
+// 🎤 コンサート（2026年11月14日 名前を「ライブ」から変更）
+//   小タブ「⭐ 公式のお知らせ」＝公式サイトのライブ・コンサート情報だけ／「📰 コンサートのニュース」＝ニュースの記事でライブ・コンサートのもの
+let liveCat = "official";
+try { if (localStorage.getItem("mp_livecat") === "news") liveCat = "news"; } catch (e) {}
+function renderLiveOfficial(s) {
+  const chips = `<div class="chips cats">${[["official", "⭐ 公式のお知らせ"], ["news", "📰 コンサートのニュース"]].map(([k, l]) =>
+    `<button type="button" class="chip ${liveCat === k ? "on" : ""}" data-livecat="${k}">${l}</button>`).join("")}</div>`;
+  const btn = `<a class="btn-official" href="https://sd-milk.com/contents/schedule?data=live" target="_blank" rel="noopener">🎟 公式のコンサート予定を見る</a>`;
+  let html;
+  if (liveCat === "news") {
+    const list = groupArticles([...(s.news || []), ...(s.appear || []), ...(s.live || []), ...(s.video || [])]).filter(n => catOfItem(n) === "live");
+    const shown = showAllTopic.liveNews ? list : list.slice(0, SHOW_N);
+    let last = "";
+    html = btn + chips + (list.length === 0 ? `<div class="empty">📰 コンサートのニュースは、まだないよ</div>` : shown.map(n => {
+        const t = new Date(n.published || ""); const label = dayLabel(isNaN(t) ? "" : ymd(t));
+        const head = label !== last ? `<p class="day">${label}</p>` : ""; last = label;
+        return head + articleCard(n);
+      }).join(""))
+      + (list.length > SHOW_N && !showAllTopic.liveNews ? `<button class="more" id="btnMore">もっと見る（あと ${list.length - SHOW_N} 件）</button>` : "");
+  } else {
+    const list = groupArticles([...(s.live || []).filter(n => n.official || /オフィシャル/.test(n.source || "")), ...offOf(s, ["LIVE", "GOODS", "FC", "TICKET"])], true);   // 公式サイト直送も入れる（2026-11-18 見本B）
+    const shown = showAllTopic.live ? list : list.slice(0, SHOW_N);
+    html = btn + chips + (list.length === 0 ? `<div class="empty">🎤 公式のコンサート情報は、まだ集まっていないよ</div>` : shown.map(n => articleCard(n)).join(""))
+      + (list.length > SHOW_N && !showAllTopic.live ? `<button class="more" id="btnMore">もっと見る（あと ${list.length - SHOW_N} 件）</button>` : "")
+      + `<p class="info" style="text-align:center">M!LK 公式サイトのお知らせだけを出しています。ニュースの記事は「📰 コンサートのニュース」にあるよ</p>`;
+  }
+  $("items").innerHTML = html;
+  document.querySelectorAll("[data-livecat]").forEach(b => b.onclick = () => {
+    liveCat = b.dataset.livecat; try { localStorage.setItem("mp_livecat", liveCat); } catch (e) {} render();
+  });
+  const more = $("btnMore");
+  if (more) more.onclick = () => { if (liveCat === "news") showAllTopic.liveNews = true; else showAllTopic.live = true; render(); };
+  renderDeadlines(s);
+}
+// 📺 出演：公式のお知らせを、ドラマ・バラエティ（テレビ）・ラジオ・雑誌などに分ける
+// 「🎥 動画・インタビュー」ボタンを押すと、出演タブの中で動画・インタビューの一覧に切りかわる（もう一度押すと、もとの出演の一覧）
+let appearVid = false, showAllAppearVid = false;
+let appearOpen = null;   // 出演タブで開いている種類（null＝まだ決めていない→いちばん上だけ開く）
+try { const v = JSON.parse(localStorage.getItem("mp_appear_open") || "null"); if (Array.isArray(v)) appearOpen = new Set(v); } catch (e) {}
+function renderAppearOfficial(s) {
+  const list = groupArticles([...(s.appear || []).filter(n => n.official || /オフィシャル/.test(n.source || "")), ...offOf(s, ["MEDIA"])], true);   // 公式サイト直送も入れる（2026-11-18 見本B）
+  const groups = [["drama", "🎬 ドラマ・舞台"], ["tv", "📺 バラエティ・テレビ"], ["radio", "📻 ラジオ"], ["magazine", "📖 雑誌・表紙"], ["live", "🎤 イベント・フェス"], ["music", "🎵 音楽"], ["other", "💬 そのほか"]];
+  // いちばん上は「公式のテレビ・雑誌の予定」と「TVer」を横に2つ（2026年11月15日）。動画・インタビューは下の箱から
+  let html = `<div class="btn-row two-line"><a class="btn-official" href="https://sd-milk.com/contents/schedule?data=media" target="_blank" rel="noopener">📺 公式のテレビ・<br>雑誌の予定</a>`
+    + `<a class="btn-official tver" href="https://tver.jp/search/M!LK" target="_blank" rel="noopener">▶ TVer で<br>番組を見る</a></div>`;
+  const vids = groupArticles([...(s.news || []), ...(s.appear || []), ...(s.live || []), ...(s.video || [])]).filter(n => catOfItem(n) === "video");
+  if (appearVid) {
+    // 🎥 動画・インタビューの一覧（5件＋もっと見る）
+    const shown = showAllAppearVid ? vids : vids.slice(0, SHOW_N);
+    let last = "";
+    html += `<button type="button" class="more back" id="btnVidBack">← 出演の一覧にもどる</button>`
+      + (vids.length === 0 ? `<div class="empty">🎥 動画・インタビューの記事は、まだないよ</div>` : shown.map(n => {
+          const t = new Date(n.published || ""); const label = dayLabel(isNaN(t) ? "" : ymd(t));
+          const head = label !== last ? `<p class="day">${label}</p>` : ""; last = label;
+          return head + articleCard(n);
+        }).join(""))
+      + (vids.length > SHOW_N && !showAllAppearVid ? `<button class="more" id="btnVidMore">もっと見る（あと ${vids.length - SHOW_N} 件）</button>` : "");
+    $("items").innerHTML = html;
+  } else {
+    // 🎥 動画・インタビューの新しい3件。押すと記事へ
+    // 🎥 動画・インタビューも、ほかと同じ開け閉めできる箱（2026年11月15日）
+    if (vids.length) html += `<details class="acc" data-acc="video" ${(appearOpen ? appearOpen.has("video") : true) ? "open" : ""}>`
+      + `<summary>🎥 動画・インタビュー<small>新しい ${Math.min(3, vids.length)} 件</small></summary><div class="in">`
+      + vids.slice(0, 3).map(n => articleCard(n)).join("")
+      + (vids.length > 3 ? `<button class="more" id="btnVidMore">もっと見る（あと ${vids.length - 3} 件）</button>` : "")
+      + `</div></details>`;
+    if (list.length === 0) html += `<div class="empty">📺 公式の出演情報は、まだ集まっていないよ</div>`;
+    // 種類ごとに開け閉めできる箱（2026年11月15日 見本B）。開いたものは、このブラウザが覚えておく
+    let firstShown = vids.length > 0;   // はじめは、いちばん上の箱だけ開く
+    for (const [k, label] of groups) {
+      const g = list.filter(n => catOf(n.title, n.source, false) === k);
+      if (!g.length) continue;
+      const isOpen = appearOpen ? appearOpen.has(k) : !firstShown;
+      firstShown = true;
+      html += `<details class="acc" data-acc="${k}" ${isOpen ? "open" : ""}><summary>${label}<small>${g.length}件</small></summary>`
+        + `<div class="in">${g.map(n => articleCard(n, { dots: true })).join("")}</div></details>`;
+    }
+    $("items").innerHTML = html + `<p class="info" style="text-align:center">M!LK 公式サイトのお知らせだけを出しています。押すと公式のお知らせが開くよ</p>`;
+  }
+  document.querySelectorAll("[data-acc]").forEach(d => d.addEventListener("toggle", () => {
+    appearOpen = new Set([...document.querySelectorAll("[data-acc]")].filter(x => x.open).map(x => x.dataset.acc));
+    try { localStorage.setItem("mp_appear_open", JSON.stringify([...appearOpen])); } catch (e) {}
+  }));
+  const toTop = () => document.querySelector(".tabs").scrollIntoView({ behavior: "smooth", block: "start" });
+
+  const back = $("btnVidBack");
+  if (back) back.onclick = () => { appearVid = false; render(); toTop(); };
+  const more = $("btnVidMore");
+  if (more) more.onclick = () => { if (appearVid) showAllAppearVid = true; else { appearVid = true; showAllAppearVid = false; } render(); if (!showAllAppearVid) toTop(); };
+  renderDeadlines(s);
+}
+
+// ===== よてい帳（2026年11月14日 追加） =====
+const KIND = { youtube: ["▶ YouTube", "k-yt"], tv: ["📺 テレビ", "k-tv"], drama: ["🎬 ドラマ", "k-dr"], radio: ["📻 ラジオ", "k-ra"], sns: ["📱 SNS配信", "k-sns"], live: ["🎤 コンサート", "k-live"] };
+function kindTag(k) { const [t, c] = KIND[k] || KIND.tv; return `<span class="kind ${c}">${t}</span>`; }
+function toDate(s) { return new Date((s || "") + ":00"); }   // "2026-11-20T23:00" → 日時
+// 🤝 イベント情報（2026年11月15日 見本A → 11月16日「今月のイベント」に変更）
+//   公式のお知らせ（コンサート・出演・予定さがし）とニュースから、イベントの記事を自動で集めて「今月」の分だけ出す。
+//   題名に日付（11月20日・11/20 など）があれば、その月が今月のものだけ。日付がなければ、今月に出たお知らせだけ。
+const MEET_RE = /お見送り|ハイタッチ|握手|お渡し|サイン会|ファンミ|ファンミーティング|感謝祭|リリイベ|リリースイベント|番組イベント|観覧|抽選会|ラッキードロー|トークショー|イベント|公演|ツアー|TOUR|コンサート|CONCERT|フェス|FES(?![a-z])|FESTIVAL|歌謡祭|音楽祭|ライブ|LIVE/;
+const MEET_NG = /映像|Blu-ray|DVD|グッズ|生写真|Tシャツ|レポート|回想|振り返|インタビュー|発売|放送決定|配信決定|MV|PV/;
+function meetTag(t) {
+  const m = t.match(/お見送り会|ハイタッチ会|握手会|お渡し会|サイン会|ファンミーティング|感謝祭|リリースイベント|番組イベント|観覧|抽選会|ラッキードロー|トークショー|歌謡祭|音楽祭|フェス|FES|公演|ツアー|TOUR|コンサート|ライブ/);
+  if (!m) return "イベント";
+  const w = m[0].toUpperCase();
+  return w === "TOUR" || w === "ツアー" || w === "公演" ? "コンサート" : w === "FES" ? "フェス" : m[0];
+}
+function titleMonths(t) {   // 題名の中の日付の「月」をぜんぶ取り出す（11月20日 → 11、【10/24(土) → 10）
+  const ms = [];
+  for (const m of String(t || "").matchAll(/(\d{1,2})月\s*\d{1,2}日|(?<![\d/])(\d{1,2})\/(\d{1,2})(?![\d\/])/g)) {
+    const mo = +(m[1] || m[2]);
+    if (mo >= 1 && mo <= 12) ms.push(mo);
+  }
+  return ms;
+}
+function titleDayLabel(t, mo) {   // 今月の日付を1つ取り出して「11月20日」の形に
+  const m = String(t || "").match(new RegExp(`(?:^|[^\\d])${mo}月\\s*(\\d{1,2})日|(?:^|[^\\d/])${mo}\\/(\\d{1,2})(?![\\d/])`));
+  return m ? `${mo}月${m[1] || m[2]}日` : "";
+}
+function renderMeet(s) {
+  const now = new Date(), mo = now.getMonth() + 1, ym = `${now.getFullYear()}-${String(mo).padStart(2, "0")}`;
+  const all = [...(s.official || []), ...(s.live || []), ...(s.appear || []), ...(s.sched || []), ...(s.news || [])]
+    .filter(n => {
+      const t = n.title || "";
+      if (!/M!LK|M！LK|佐野|吉田|山中|曽野|塩[崎﨑]/.test(t + (n.source || ""))) return false;
+      if (!MEET_RE.test(t) || MEET_NG.test(t)) return false;
+      const ms = titleMonths(t);
+      const pub = (n.published || "").slice(0, 7);
+      if (ms.length) return ms.includes(mo) && pub >= `${now.getFullYear() - (mo <= 2 ? 1 : 0)}-01`;   // 日付あり：今月の日付が入っている（古すぎるお知らせは外す）
+      return pub === ym;                                     // 日付なし：今月に出たお知らせ
+    })
+    .map(n => ({ ...n, official: n.official || /オフィシャル/.test(n.source || "") }));
+  const list = groupArticles(all).sort((a, b) => (b.official - a.official) || (b.published || "").localeCompare(a.published || "")).slice(0, 5);
+  const rows = list.map(n => {
+    const t = new Date(n.published || "");
+    const when = titleDayLabel(n.title, mo);
+    const day = when ? `📅 ${when}` : (isNaN(t) ? "" : `${t.getMonth() + 1}月${t.getDate()}日のお知らせ`);
+    const src = n.official ? "⭐ 公式" : esc(n.source || "ニュース");
+    return `<a class="row" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener"><span class="tag2">${esc(meetTag(n.title))}</span><div><div class="t">${esc(n.title)}</div><div class="d">${esc(day)}　${src}</div></div></a>`;
+  }).join("");
+  $("meet").innerHTML = `<section class="meet"><h3>🤝 ${mo}月のイベント情報</h3>${rows || `<p class="note" style="margin:6px 0">今月のイベントのお知らせはまだないよ</p>`}<p class="note">公式のお知らせとニュースから、今月のイベントを自動で集めます</p></section>`;
+}
+// 📢 本日：記事からも「きょう」の放送・配信・イベントを自動でさがす（2026年11月16日）
+//   今月出た公式のお知らせ・ニュースの題名に、きょうの日付（11月16日・11/16）があるもの。
+//   または、きょう出た記事で「今夜」「本日」「このあと」などと書いてあるもの。
+function todayFromArticles(s, evs) {
+  const now = new Date(), mo = now.getMonth() + 1, dd = now.getDate(), today = ymd(now);
+  const lim = new Date(now.getTime() - 45 * 86400000).toISOString().slice(0, 10);
+  const dateRe = new RegExp(`(?:^|[^\\d])${mo}月\\s*${dd}日|(?:^|[^\\d/])${mo}\\/${dd}(?![\\d/])`);
+  const doRe = /放送|配信|出演|オンエア|生放送|ドラマ|ラジオ|番組|公演|開催|イベント|歌謡祭|音楽祭|フェス|ライブ/;
+  const ngRe = /発売|グッズ|生写真|レポート|回想|インタビュー|(放送|配信)(終了|された)|見逃し/;
+  const list = [...(s.official || []), ...(s.sched || []), ...(s.appear || []), ...(s.live || []), ...(s.news || [])].filter(n => {
+    const t = n.title || "", pub = (n.published || "").slice(0, 10);
+    if (!/M!LK|M！LK|佐野|吉田|山中|曽野|塩[崎﨑]/.test(t + (n.source || ""))) return false;
+    if (!doRe.test(t) || ngRe.test(t) || pub < lim) return false;
+    if (dateRe.test(t)) return true;
+    return pub === today && /今夜|今日|本日|このあと|この後|まもなく|今晩/.test(t);
+  }).map(n => ({ ...n, official: n.official || /オフィシャル/.test(n.source || "") }));
+  return groupArticles(list).filter(n => !evs.some(e => (e.url && e.url === n.url) || (n.title || "").includes((e.name || "").replace(/[（(].*$/, "").slice(0, 8))))
+    .map(n => {
+      const t = n.title, i = t.search(dateRe);
+      const m = t.slice(Math.max(0, i)).match(/(\d{1,2})(?:時|:)(\d{2})?/);
+      const hh = m ? +m[1] : null;
+      return { ...n, time: hh != null && hh < 30 ? `${String(hh).padStart(2, "0")}:${m[2] || "00"}` : "" };
+    })
+    .sort((a, b) => (a.time || "99").localeCompare(b.time || "99")).slice(0, 4);
+}
+function renderEvents(s) {
+  const evs = s.events || [];
+  const now = new Date();
+  const today = ymd(now);
+  // 📢 本日の放送・配信予定（新着の上）。行を押すと、その配信や番組のページに飛ぶ
+  //   リンクがないときは、YouTube なら M!LK 公式チャンネル、テレビなどは TVer の M!LK さがしを開く
+  const todays = evs.filter(e => e.next.slice(0, 10) === today);
+  const fallback = (k) => k === "youtube" ? "https://www.youtube.com/channel/UCHqQCpqvSOcHQr6Oqa4_5wg"
+    : k === "sns" ? "https://www.instagram.com/milk_official_2014/" : k === "live" ? "https://sd-milk.com/" : "https://tver.jp/search/M!LK";
+  const arts = todayFromArticles(s, todays);
+  const artRows = arts.map(n => `<a class="ev" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener"><span class="time">${n.time ? esc(n.time) : "きょう"}</span><span class="nm"><span class="kind k-art">📰 記事から</span>${esc(n.title)}<small class="left2">${n.official ? "⭐ 公式" : esc(n.source || "ニュース")}</small></span><span class="go">▶ 記事</span></a>`).join("");
+  if (todays.length === 0 && arts.length === 0) {
+    const nx = evs.find(e => toDate(e.next) > now);
+    const w = nx ? toDate(nx.next) : null;
+    $("today").innerHTML = `<div class="today none"><span class="tname">📢 本日</span>きょうの放送・配信予定はないよ${nx ? `<small>つぎ：${w.getMonth() + 1}/${w.getDate()}(${"日月火水木金土"[w.getDay()]}) ${nx.next.slice(11, 16)} ${esc(nx.name)}</small>` : ""}</div>`;
+  } else {
+    $("today").innerHTML = `<div class="today"><span class="tname">📢 本日</span>${todays.map(e => {
+      const st = toDate(e.next), mins = Math.round((st - now) / 60000);
+      let right, go;
+      if (mins > 0) right = `<small class="left2">⏰ あと ${mins >= 60 ? Math.floor(mins / 60) + "時間" : ""}${mins % 60}分</small>`;
+      else if (mins > -60) right = `<small class="left2">🔴 いま${e.kind === "youtube" ? "配信" : e.kind === "live" ? "開演" : "放送"}中！</small>`;
+      else right = `<small class="left2 done">おわり</small>`;
+      const url = safeUrl(e.url) || fallback(e.kind);
+      go = mins > -60 ? (safeUrl(e.url) ? "▶ 見る" : (e.kind === "youtube" ? "▶ YouTube" : e.kind === "sns" ? "▶ インスタ" : e.kind === "live" ? "▶ 公式" : "▶ TVer")) : "";
+      if (e.kind === "tv" || e.kind === "drama") {   // テレビ・ドラマは「▶ 見る」の横に「TVer」も（2026年11月16日）
+        const q = String(e.name || "").replace(/[（(].*?[）)]/g, "").replace(/[『』「」【】]/g, " ").replace(/第\d+話.*$/, "").trim() || "M!LK";
+        const tver = "https://tver.jp/search/" + encodeURIComponent(q);
+        return `<div class="ev ev2 ${mins <= -60 ? "past" : ""}"><a class="evmain" href="${esc(url)}" target="_blank" rel="noopener"><span class="time">${esc(e.next.slice(11, 16))}</span><span class="nm">${kindTag(e.kind)}${esc(e.name)}${right}</span></a><span class="gos">${go ? `<a class="go" href="${esc(url)}" target="_blank" rel="noopener">${go}</a>` : ""}<a class="go gtv" href="${esc(tver)}" target="_blank" rel="noopener">TVer</a></span></div>`;
+      }
+      return `<a class="ev ${mins <= -60 ? "past" : ""}" href="${esc(url)}" target="_blank" rel="noopener"><span class="time">${esc(e.next.slice(11, 16))}</span><span class="nm">${kindTag(e.kind)}${esc(e.name)}${right}</span>${go ? `<span class="go">${go}</span>` : ""}</a>`;
+    }).join("")}${artRows}${arts.length ? `<p class="artnote">📰 は記事から自動で見つけた、きょうの予定です</p>` : ""}</div>`;
+  }
+  // 🗓 よてい帳の一覧（近い順）
+  $("evs").innerHTML = evs.length === 0
+    ? `<div class="empty">🗓 まだ予定はないよ。<br>「＋ 予定を入れる」から入れてみてね</div>`
+    : evs.map(e => {
+        const st = toDate(e.next);
+        const w = "日月火水木金土"[st.getDay()];
+        const nm = safeUrl(e.url) ? `<a href="${esc(safeUrl(e.url))}" target="_blank" rel="noopener">${esc(e.name)}</a>` : esc(e.name);
+        return `<div class="evitem">
+          <div class="cal"><b>${st.getDate()}</b><small>${st.getMonth() + 1}月(${w})</small></div>
+          <div class="name">${kindTag(e.kind)}${nm}${e.repeat === "weekly" ? `<span class="rep">🔁 毎週</span>` : ""}${e.auto ? `<span class="rep auto">自動</span>` : ""}
+            <span class="date">${esc(e.next.slice(11, 16))} から${memberDots(e.name).replace('class="mem"', 'class="mem inline"')}</span></div>
+          <div class="actions"><button class="del" data-ev="${esc(e.id)}">消す</button></div>
+        </div>`;
+      }).join("");
+  document.querySelectorAll("[data-ev]").forEach(b => b.onclick = async () => {
+    if (!confirm("この予定を消しますか？")) return;
+    state = await api("/api/events/" + b.dataset.ev, { method: "DELETE" });
+    render();
+  });
+  renderCandidates(s);
+}
+// 💡 記事から見つけた予定：題名に「11月20日(金)23時」のような日にちと時間があるもの
+function renderCandidates(s) {
+  const re = /(\d{1,2})月(\d{1,2})日[（(]?[月火水木金土日]?[)）]?\s*(\d{1,2})(?:時(\d{1,2})?分?|:(\d{2}))/;
+  const now = new Date(), seen = new Set(), out = [];
+  const have = new Set((s.events || []).map(e => e.date + " " + e.time));
+  for (const n of [...(s.appear || []), ...(s.live || []), ...(s.news || [])]) {
+    const m = re.exec(n.title || "");
+    if (!m) continue;
+    let y = now.getFullYear();
+    const mo = +m[1], da = +m[2], hh = +m[3], mi = +(m[4] || m[5] || 0);
+    if (mo < now.getMonth() + 1 - 1) y += 1;   // 1月に「12月…」は去年ではなく、来年の1月の話のことがある
+    const date = `${y}-${pad(mo)}-${pad(da)}`, time = `${pad(hh)}:${pad(mi)}`;
+    if (new Date(`${date}T${time}:00`) < now || have.has(date + " " + time)) continue;
+    const k = date + " " + time;   // 同じ日にち・時間の予定は1つだけ出す
+    if (seen.has(k)) continue;
+    seen.add(k);
+    const kind = /ドラマ/.test(n.title) ? "drama" : /ラジオ/.test(n.title) ? "radio" : /YouTube|配信/.test(n.title) ? "youtube" : "tv";
+    const name = n.title.replace(/^プレスリリース：/, "").split(/[／/]/)[0].slice(0, 60);
+    out.push({ name, date, time, kind, title: n.title });
+  }
+  $("cands").innerHTML = out.slice(0, 3).map((c, i) => `<div class="cand">💡 <b>記事から見つけた予定</b>
+      <span class="ct">「${esc(c.title.replace(/^プレスリリース：/, "").slice(0, 70))}」</span>
+      <span class="cw">${kindTag(c.kind)}${+c.date.slice(5, 7)}月${+c.date.slice(8)}日 ${c.time}</span>
+      <button class="btn-cand" data-cand="${i}">＋ よてい帳に入れる</button></div>`).join("");
+  document.querySelectorAll("[data-cand]").forEach(b => b.onclick = async () => {
+    const c = out[+b.dataset.cand];
+    try {
+      state = await api("/api/events", { method: "POST", body: JSON.stringify({ name: c.name, date: c.date, time: c.time, kind: c.kind, repeat: "none", url: "", notify: ["eve", "30", "start"] }) });
+      render();
+    } catch (e) { alert(e.message); }
+  });
+}
+
+// ===== 🏠 公式サイトの NEWS（2026年11月18日 見本A・B・C） =====
+//   milkpost.py が sd-milk.com/contents/news を10分ごとに直接読む（s.official）。押すと公式サイトのそのお知らせへ
+const OFF_CATS = [["all", "すべて"], ["MEDIA", "📺 メディア"], ["LIVE", "🎤 ライブ・イベント"], ["GOODS", "🛍 グッズ"], ["RELEASE", "💿 リリース"], ["TICKET", "🎟 チケット"], ["FC", "💗 FC"]];
+const offKey = (c) => /^LIVE/.test(c) ? "LIVE" : ["MEDIA", "GOODS", "RELEASE", "TICKET", "FC"].includes(c) ? c : "OTHER";
+const offLabel = (k) => (OFF_CATS.find(x => x[0] === k) || [k, "💬 そのほか"])[1];
+function offOf(s, keys) { return (s.official || []).filter(n => (n.cats || []).some(c => keys.includes(offKey(c)))); }
+let offCat = "all", showAllOff = false;
+try { const v = localStorage.getItem("mp_offcat"); if (OFF_CATS.some(x => x[0] === v)) offCat = v; } catch (e) {}
+function offCard(n) {
+  const t = new Date(n.published || ""), day = isNaN(t) ? "" : `${t.getMonth() + 1}/${t.getDate()}`;
+  const isNew = (Date.now() - t.getTime()) < 3 * 86400000;
+  const tags = [...new Set((n.cats || []).map(offKey))].map(k => `<span class="ct c-${k}">${offLabel(k)}</span>`).join("");
+  return `<a class="offc" href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener"><div class="m"><span class="of">⭐ 公式サイト</span>${tags}${esc(day)}${isNew ? ` <span class="nw">NEW</span>` : ""}</div><div class="t">${esc(n.title)}</div></a>`;
+}
+function offSorted(s) { return [...(s.official || [])].sort((a, b) => (b.published || "").localeCompare(a.published || "")); }
+function renderOffTab(s) {
+  const all = offSorted(s);
+  const list = offCat === "all" ? all : all.filter(n => (n.cats || []).some(c => offKey(c) === offCat));
+  const shown = showAllOff ? list : list.slice(0, SHOW_N);
+  $("items").innerHTML = `<div class="chips cats">${OFF_CATS.map(([k, l]) => `<button type="button" class="chip ${offCat === k ? "on" : ""}" data-offcat="${k}">${l}</button>`).join("")}</div>`
+    + (all.length === 0 ? `<div class="empty">🏠 公式サイトのお知らせは、つぎの見回りで集めるよ</div>`
+      : list.length === 0 ? `<div class="empty">この種類のお知らせは、いまはないよ</div>` : shown.map(offCard).join(""))
+    + (list.length > SHOW_N && !showAllOff ? `<button class="more" id="btnMore">もっと見る（あと ${list.length - SHOW_N} 件）</button>` : "")
+    + `<a class="btn-offnews" href="https://sd-milk.com/contents/news" target="_blank" rel="noopener">🏠 公式サイトの NEWS を開く ›</a>`;
+  document.querySelectorAll("[data-offcat]").forEach(b => b.onclick = () => {
+    offCat = b.dataset.offcat; showAllOff = false; try { localStorage.setItem("mp_offcat", offCat); } catch (e) {} render();
+  });
+  const more = $("btnMore");
+  if (more) more.onclick = () => { showAllOff = true; render(); };
+}
+function renderOffBox(s) {
+  const top = offSorted(s).slice(0, 3);
+  $("offBox").innerHTML = top.length === 0 ? "" : `<section class="offbox"><h3>🏠 公式サイトの新しいお知らせ</h3>${top.map(offCard).join("")}<a class="btn-offnews" href="https://sd-milk.com/contents/news" target="_blank" rel="noopener">🏠 公式サイトの NEWS をもっと見る ›</a></section>`;
+}
+
+// ===== 🎂 記念日カレンダー＋当日のお祝い（2026年11月17日 見本B＋C） =====
+//   結成日：公式サイトは「2014年11月結成」、日にちは THE FIRST TIMES の記事（11_記念日調べ.md）
+//   誕生日：スターダストプロモーションの公式プロフィール（11_記念日調べ.md）
+//   画面を新しくするたび（1分ごと）に、きょうの日付で「あと◯日」・年齢・当日のお祝いを自動で計算する
+const KINEN = [
+  { kind: "milk", name: "M!LK", y: 2014, m: 11, d: 24 },
+  { kind: "bd", name: "吉田仁人", y: 1999, m: 12, d: 15, col: "#ffe36e", bg: "#fff6c9" },
+  { kind: "bd", name: "佐野勇斗", y: 1998, m: 3, d: 23, col: "#ffb3c9", bg: "#ffe8ef" },
+  { kind: "bd", name: "塩﨑太智", y: 2000, m: 9, d: 11, col: "#9fc3ff", bg: "#e6f0ff" },
+  { kind: "bd", name: "曽野舜太", y: 2002, m: 5, d: 3, col: "#ff9494", bg: "#ffe6e6" },
+  { kind: "bd", name: "山中柔太朗", y: 2001, m: 12, d: 23, col: "#dfe6f1", bg: "#f1f4f9" },
+];
+const MILK_DOT = "conic-gradient(#ffb3c9,#ffe36e,#9fc3ff,#dfe6f1,#ff9494)";
+function renderKinen() {
+  const now = new Date(), t0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const list = KINEN.map(k => {
+    let ny = t0.getFullYear(), nd = new Date(ny, k.m - 1, k.d);
+    if (nd < t0) nd = new Date(++ny, k.m - 1, k.d);
+    const left = Math.round((nd - t0) / 86400000);
+    return { ...k, left, n: ny - k.y };   // n：その日で何歳／何周年
+  }).sort((a, b) => a.left - b.left);
+  $("kinen").innerHTML = `<section class="kinen"><h3>🎂 記念日カレンダー</h3>${list.map(k => {
+    const today = k.left === 0, md = `${k.m}/${k.d}`;
+    const dot = `<span class="kdot" style="background:${k.kind === "milk" ? MILK_DOT : k.col}"></span>`;
+    const title = k.kind === "milk"
+      ? (today ? `🥛 M!LK 結成${k.n}周年！` : `🥛 M!LK 結成${k.n}周年`)
+      : (today ? `🎂 ${k.name} ${k.n}歳の誕生日！` : `${k.name} ${k.n}歳に`);
+    const sub = k.kind === "milk" ? `${k.y}年${k.m}月${k.d}日 結成` : (today ? `${k.y}年${k.m}月${k.d}日生まれ` : `${k.y}年${k.m}月${k.d}日生まれ\nいま${k.n - 1}歳`);
+    return `<div class="kr ${today ? "today" : ""}" style="--kc:${k.kind === "milk" ? "#ffe3ec" : k.bg}">${dot}<span class="kd">${md}</span><span class="kn">${esc(title)}<small>${esc(sub)}</small></span><span class="kleft">${today ? "🎉 本日！" : `あと${k.left}日`}</span></div>`;
+  }).join("")}</section>`;
+  const tod = list.filter(k => k.left === 0);
+  $("party").innerHTML = tod.map(k => {
+    const conf = (a, b, c, d) => `<span class="conf" style="left:10px;top:6px">${a}</span><span class="conf" style="right:12px;top:8px">${b}</span><span class="conf" style="left:16px;bottom:6px">${c}</span><span class="conf" style="right:16px;bottom:4px">${d}</span>`;
+    if (k.kind === "milk") return `<div class="party">${conf("🎉", "✨", "🎈", "🥛")}<b>本日 M!LK 結成${k.n}周年！</b><small>${k.y}年${k.m}月${k.d}日の結成から${k.n}年<br>いつもありがとう💐</small></div>`;
+    return `<div class="party" style="background:linear-gradient(120deg,${k.bg},#fffdf6,${k.bg});border-color:${k.col}">${conf("🎂", "✨", "🎈", "🎉")}<b>本日 ${esc(k.name)} さんの<br>${k.n}歳の誕生日！</b><small>${k.y}年${k.m}月${k.d}日生まれ<br>おめでとう🎉</small></div>`;
+  }).join("");
+}
+function renderDeadlines(s) {
+  renderEvents(s);
+  renderMeet(s);
+  renderKinen();
+  renderOffBox(s);
+
+  // アイデア2：大きな数字のカウントダウン（終わったものは下へ）
+  const dls = [...s.deadlines].sort((a, b) => ((a.left ?? 0) < 0) - ((b.left ?? 0) < 0));
+  $("dls").innerHTML = dls.length === 0
+    ? `<div class="empty">📅 まだ締め切りはないよ。<br>上の欄から入れてみてね</div>`
+    : dls.map(d => {
+        const u = safeUrl(d.url);
+        const nm = u ? `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(d.name)}</a>` : esc(d.name);
+        return `<div class="dl ${d.left !== null && d.left < 0 ? "over" : ""}">
+          ${countBadge(d.left)}
+          <div class="name">${nm}<span class="date">${esc(mdw(d.date))}まで</span></div>
+          <div class="actions"><button class="del" data-id="${esc(d.id)}">消す</button></div>
+        </div>`;
+      }).join("");
+  // しめきり帳の「消す」だけ（よてい帳の「消す」は data-ev で別。2026年11月14日 直した）
+  document.querySelectorAll(".del[data-id]").forEach(b => b.onclick = async () => {
+    if (!confirm("この締め切りを消しますか？")) return;
+    state = await api("/api/deadlines/" + b.dataset.id, { method: "DELETE" });
+    render();
+  });
+}
+
+
+// 🆕 新しく来た情報（2026年11月16日 追加）
+//   画面は1分ごとに自動で新しくなる（パソコンのアプリは YouTube を3分ごと・ニュースを10分ごとに自動で見回る）。
+//   そのとき新しく見つかったものを、「いま見回る！」のすぐ下の黄色い箱に出す（2026-11-17 いちばん上から移動）。押すと、そのページに飛ぶ。
+let knownIds = null, freshList = [];
+function allArrivals(st) {
+  const out = [];
+  (st.items || []).forEach(n => out.push({ ...n, fk: isShort(n) ? "📱 ショート" : "▶ YouTube" }));
+  Object.entries(st.member_yt || {}).forEach(([ch, l]) => (l || []).forEach(n => out.push({ ...n, fk: (isShort(n) ? "📱 " : "▶ ") + ch })));
+  (st.official || []).forEach(n => out.push({ ...n, fk: "🏠 公式サイト" }));
+  (st.news || []).forEach(n => out.push({ ...n, fk: "📰 ニュース" }));
+  [...(st.live || []), ...(st.appear || [])].forEach(n => out.push({ ...n, fk: n.official ? "⭐ 公式" : "📰 ニュース" }));
+  return out.filter(n => n.id && n.url);
+}
+function takeArrivals(st) {   // 新しく来たものの数を返す
+  const all = allArrivals(st);
+  if (knownIds === null) { knownIds = new Set(all.map(n => n.id)); return 0; }
+  const seenUrl = new Set(freshList.map(n => n.url));
+  const nw = all.filter(n => !knownIds.has(n.id) && !seenUrl.has(n.url) && (seenUrl.add(n.url), true));
+  nw.forEach(n => knownIds.add(n.id));
+  if (nw.length) freshList = [...nw.sort((a, b) => (b.published || "").localeCompare(a.published || "")), ...freshList].slice(0, 8);
+  renderFresh();
+  return nw.length;
+}
+function renderFresh() {
+  if (!freshList.length) { $("fresh").innerHTML = ""; return; }
+  $("fresh").innerHTML = `<section class="fresh"><div class="fh"><span>🆕 新しい情報が来たよ（${freshList.length}件）</span><button id="btnFreshClose">とじる</button></div>${freshList.map(n =>
+    `<a href="${esc(safeUrl(n.url))}" target="_blank" rel="noopener"><span class="fk">${esc(n.fk)}</span><span>${esc(n.title)}</span><span class="go2">見る ›</span></a>`).join("")}</section>`;
+  $("btnFreshClose").onclick = () => { freshList = []; renderFresh(); };
+}
+
+async function refresh() {
+  try { state = await api("/api/state"); render(); takeArrivals(state); }
+  catch (e) { $("err").innerHTML = `<div class="err">M!LKポストとつながりません。「milkポスト起動」をダブルクリックしてください。</div>`; }
+}
+
+$("tabYt").onclick = () => setTab("yt");
+$("tabOff").onclick = () => setTab("off");
+$("tabNews").onclick = () => setTab("news");
+$("tabLive").onclick = () => setTab("live");
+$("tabAppear").onclick = () => setTab("appear");
+$("tabX").onclick = () => setTab("x");
+$("tabIg").onclick = () => setTab("ig");
+
+$("btnCheck").onclick = async () => {
+  const b = $("btnCheck");
+  b.disabled = true; b.innerHTML = `<span class="milk">🥛</span> 見回り中…<small class="sub">YouTube・ニュースを見に行っているよ</small>`;
+  let msg = "";
+  try {
+    state = await api("/api/check", { method: "POST" }); render();
+    const n = takeArrivals(state);
+    msg = n ? `🆕 新しい情報が ${n} 件見つかったよ（すぐ下に出ています）` : `新しいものはなかったよ（${esc((state.last_check || "").slice(11, 16))} に見回り）`;
+
+  }
+  catch (e) { $("err").innerHTML = `<div class="err">${esc(e.message)}</div>`; }
+  $("checkMsg").innerHTML = msg;
+  b.disabled = false; b.innerHTML = `<span class="milk">🥛</span> いま見回る！<small class="sub">YouTube・ニュースの最新を今すぐチェック</small>`;
+};
+
+// よてい帳の入力：えらぶボタン（1つだけ／いくつでも）
+document.querySelectorAll("#evForm .chips").forEach(box => box.querySelectorAll(".chip").forEach(b => b.onclick = () => {
+  if (box.classList.contains("multi")) b.classList.toggle("on");
+  else { box.querySelectorAll(".chip").forEach(x => x.classList.remove("on")); b.classList.add("on"); }
+}));
+$("eDate").value = ymd(new Date());
+$("evForm").onsubmit = async (ev) => {
+  ev.preventDefault();
+  $("evMsg").textContent = "";
+  const pick = (id) => [...document.querySelectorAll(`#${id} .chip.on`)].map(b => b.dataset.v);
+  const body = { name: $("eName").value, date: $("eDate").value, time: $("eTime").value,
+                 kind: pick("eKind")[0] || "tv", repeat: pick("eRepeat")[0] || "none", notify: pick("eNotify"), url: $("eUrl").value };
+  if (!body.name.trim()) { $("evMsg").textContent = "なにを見るかを入れてください"; return; }
+  if (!body.date || !body.time) { $("evMsg").textContent = "日にちと時間を入れてください"; return; }
+  try {
+    state = await api("/api/events", { method: "POST", body: JSON.stringify(body) });
+    $("eName").value = ""; $("eUrl").value = "";
+    $("evBox").open = false;
+    render();
+  } catch (e) { $("evMsg").textContent = e.message; }
+};
+
+$("form").onsubmit = async (ev) => {
+  ev.preventDefault();
+  $("formMsg").textContent = "";
+  const body = { name: $("fName").value, date: $("fDate").value, url: $("fUrl").value };
+  if (!body.name.trim()) { $("formMsg").textContent = "なにの締め切りかを入れてください"; return; }
+  if (!body.date) { $("formMsg").textContent = "締め切りの日を入れてください"; return; }
+  try {
+    state = await api("/api/deadlines", { method: "POST", body: JSON.stringify(body) });
+    $("form").reset(); render();
+  } catch (e) { $("formMsg").textContent = e.message; }
+};
+
+$("btnTest").onclick = async () => {
+  try {
+    const r = await api("/api/test-notify", { method: "POST" });
+    state = r; render();
+    $("testMsg").textContent = r.test_ok === true ? "送りました。スマホの ntfy を見てください。"
+      : r.dry_run ? "ためし運転中なので、送ったことにして記録だけしました。"
+      : "送れませんでした。インターネットにつながっているか確かめてください。";
+  } catch (e) { $("testMsg").textContent = e.message; }
+};
+
+if (location.protocol === "file:") {
+  $("main").innerHTML = `<div class="warn">このファイルを直接開いても動きません。<br>
+    同じフォルダの「<b>milkポスト起動</b>」をダブルクリックしてください。自動でこの画面が開きます。</div>`;
+} else {
+  refresh();
+  setInterval(refresh, 60 * 1000); // 1分ごとに画面を新しくする
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });   // 画面にもどってきたら、すぐ新しくする
+}
+</script>
+</body>
+</html>
