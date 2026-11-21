@@ -29,7 +29,10 @@ jobs:
           git add index.html state.json
           git diff --cached --quiet || (git commit -m "ページを新しくした" && git push)
       - name: 公開する準備
-        run: mkdir -p _site && cp index.html _site/ && printf 'User-agent: *\nDisallow: /\n' > _site/robots.txt
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          printf 'User-agent: *\nDisallow: /\n' > _site/robots.txt
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
