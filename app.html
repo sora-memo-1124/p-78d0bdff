@@ -350,7 +350,8 @@
   .today .tname { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); padding: 2px 18px; white-space: nowrap;
                   background: #fff; border: 3px solid #ffc2d4; border-radius: 999px; font-size: 17px; color: var(--pink); }
   /* 最新のタブは6つ横1列（2026年11月15日 見本C）：YouTube・X・インスタ・ニュース・コンサート・出演 */
-  .tabs { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
+  .tabs { grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 2px; }
+  .tabs .tab { padding-left: 0; padding-right: 0; }
   .tabs .tab .wd { overflow: hidden; text-overflow: clip; white-space: nowrap; letter-spacing: -0.5px; }
   .tabs .tab { min-height: 56px; padding: 2px 0; }
   .tabs .tab .wd { font-size: 10px; letter-spacing: -.06em; white-space: nowrap; }
@@ -358,6 +359,8 @@
   .mem-tabs .mt.one { flex: 0 0 100%; }
   .ytm-head a.xb { border-color: #222; color: #222; }
   .ytm-head a.ib { border-color: #d6366a; color: #d6366a; }
+  .ytm-head a.tb { background: #111; border: 3px solid #fe2c55; box-shadow: -3px 0 0 #25f4ee; color: #fff; }
+  .sns-grid .sg.tt { grid-column: 1 / -1; background: #111; color: #fff; border: 3px solid #fe2c55; box-shadow: -3px 0 0 #25f4ee; }
   .snote { font-size: 12px; color: var(--sub); text-align: center; margin: 10px 4px 4px; line-height: 1.5; }
   .checkmsg:empty { display: none; }
   .fresh { margin: 0 0 18px; background: #fffdf2; border: 3px solid #ffe36e; border-radius: 18px; padding: 10px 12px 8px; box-shadow: 0 3px 10px rgba(255,200,80,.25); }
@@ -425,6 +428,8 @@
         <a class="sg hp" href="https://sd-milk.com/" target="_blank" rel="noopener">🏠 公式サイト</a>
         <a class="sg" href="https://www.instagram.com/milk_official_2014/" target="_blank" rel="noopener">📷 インスタ</a>
         <a class="sg" href="https://x.com/milk_info" target="_blank" rel="noopener">📣 X</a>
+        <!-- TikTok（2026年11月25日 見本B）。公式サイトにのっている M!LK 公式 TikTok -->
+        <a class="sg tt" href="https://www.tiktok.com/@milk_official" target="_blank" rel="noopener">🎵 TikTok（@milk_official）</a>
       </div>
     </div>
     <!-- メンバーの名前タブ。押すと、その人の公式ページ（スターダストプロモーションのプロフィール）・X・インスタ・YouTube が出る。
@@ -452,6 +457,8 @@
       <!-- X・インスタのタブ（2026年11月15日 見本C）。投稿の一覧は出せないので、公式とメンバーの「開く」ボタンだけ -->
       <button class="tab" id="tabX" role="tab" type="button"><span class="ic">𝕏</span><span class="wd">X</span></button>
       <button class="tab" id="tabIg" role="tab" type="button"><span class="ic">📷</span><span class="wd">インスタ</span></button>
+      <!-- TikTok のタブ（2026年11月25日 見本A）。M!LK 公式だけ（メンバー個人は公式に見つからない）。14_TikTok調べ.md -->
+      <button class="tab" id="tabTt" role="tab" type="button"><span class="ic">🎵</span><span class="wd">TikTok</span></button>
       <button class="tab" id="tabNews" role="tab" type="button"><span class="ic">📰</span><span class="wd">ニュース</span></button>
       <button class="tab" id="tabLive" role="tab" type="button"><span class="ic">🎤</span><span class="wd">コンサート</span></button>
       <button class="tab" id="tabAppear" role="tab" type="button"><span class="ic">📺</span><span class="wd">出演</span></button>
@@ -576,7 +583,7 @@ let showAll = false;
 let showAllNews = false;
 // 新着の「YouTube／ニュース」どちらを見ていたかを、このブラウザに覚えておく
 let tab = "yt";
-try { const t = localStorage.getItem("mp_tab"); if (["news", "live", "appear", "x", "ig", "off"].includes(t)) tab = t; } catch (e) {}
+try { const t = localStorage.getItem("mp_tab"); if (["news", "live", "appear", "x", "ig", "off", "tt"].includes(t)) tab = t; } catch (e) {}
 let showAllLive = false;
 const SHOW_N = 5;   // 新着の一覧は、はじめは5件だけ見せる。のこりは「もっと見る」（2026年11月14日 見本A）
 // ショート動画には「📱 ショート」の印（2026年11月16日）
@@ -611,6 +618,13 @@ function renderSnsTab(k) {
   document.querySelectorAll("[data-snssel]").forEach(b => b.onclick = () => {
     snsSel[k] = +b.dataset.snssel; try { localStorage.setItem("mp_" + k + "sel", snsSel[k]); } catch (e) {} render();
   });
+}
+// 🎵 TikTok のタブ（2026年11月25日 見本A）：M!LK 公式（公式サイトにのっている @milk_official）だけ
+const TIKTOK_OFFICIAL = "https://www.tiktok.com/@milk_official";
+function renderTikTokTab() {
+  $("items").innerHTML = `<div class="mem-tabs"><button type="button" class="mt milk one on">🥛 M!LK公式</button></div>`
+    + `<div class="ytm-head milkh"><div><b>🎵 M!LK 公式 TikTok</b><small>@milk_official</small></div><a class="tb" href="${TIKTOK_OFFICIAL}" target="_blank" rel="noopener">TikTokを開く ›</a></div>`
+    + `<p class="snote">メンバー個人の TikTok は、公式には見つからなかったので、M!LK 公式だけです。<br>TikTok の投稿は自動で集められないので、ボタンで開いて見てね</p>`;
 }
 function setTab(t) {
   tab = t;
@@ -722,8 +736,9 @@ function render() {
   $("tabLive").setAttribute("aria-selected", tab === "live");
   $("tabAppear").classList.toggle("on", tab === "appear");
   $("tabAppear").setAttribute("aria-selected", tab === "appear");
-  for (const [id, k] of [["tabX", "x"], ["tabIg", "ig"], ["tabOff", "off"]]) { $(id).classList.toggle("on", tab === k); $(id).setAttribute("aria-selected", tab === k); }
+  for (const [id, k] of [["tabX", "x"], ["tabIg", "ig"], ["tabOff", "off"], ["tabTt", "tt"]]) { $(id).classList.toggle("on", tab === k); $(id).setAttribute("aria-selected", tab === k); }
   if (tab === "x" || tab === "ig") { renderSnsTab(tab); renderDeadlines(s); return; }
+  if (tab === "tt") { renderTikTokTab(); renderDeadlines(s); return; }
   if (tab === "off") { renderOffTab(s); renderDeadlines(s); return; }
   if (tab === "news") { renderNewsCats(s); return; }
   if (tab === "live") { renderLiveOfficial(s); return; }
@@ -1369,6 +1384,7 @@ $("tabLive").onclick = () => setTab("live");
 $("tabAppear").onclick = () => setTab("appear");
 $("tabX").onclick = () => setTab("x");
 $("tabIg").onclick = () => setTab("ig");
+$("tabTt").onclick = () => setTab("tt");
 
 $("btnCheck").onclick = async () => {
   const b = $("btnCheck");
