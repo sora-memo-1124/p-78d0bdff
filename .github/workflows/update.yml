@@ -36,4 +36,21 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
-      - uses: actions/deploy-pages@v4
+      - name: 公開する（1回目）
+        id: deploy1
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+      - name: 失敗したら少し待つ
+        if: steps.deploy1.outcome == 'failure'
+        run: sleep 30
+      - name: 公開する（2回目）
+        id: deploy2
+        if: steps.deploy1.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+      - name: また失敗したら、もう少し待つ
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
+        run: sleep 60
+      - name: 公開する（3回目）
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
+        uses: actions/deploy-pages@v4
